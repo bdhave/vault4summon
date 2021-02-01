@@ -1,5 +1,6 @@
 target/
 test/
+temp/
 .gitignore
 LICENSE
 startVaultDEV.sh

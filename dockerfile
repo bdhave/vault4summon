@@ -1,9 +1,9 @@
-FROM golang:alpine as builder-base
+FROM golang:alpine as golang-base
 RUN apk -U upgrade
 
 
 # compile vault4summon
-FROM builder-base as builder
+FROM golang-base as builder
 ADD . /source
 WORKDIR /source
 RUN go mod download all
