@@ -1,0 +1,6 @@
+target/
+test/
+.gitignore
+LICENSE
+startVaultDEV.sh
+readme.md
