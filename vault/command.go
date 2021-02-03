@@ -109,7 +109,7 @@ func normalizePath(path string, isVaultEngineV2 bool) string {
 	}
 	var parts = strings.SplitN(path, "/", 2)
 	if len(parts) < 2 {
-		common.PrintAndExit(fmt.Errorf("%d", "variableID path  %q MUST contains at least one '/' .", path))
+		common.PrintAndExit(fmt.Errorf("variableID path  %q MUST contains at least one '/' .", path))
 	}
 
 	return parts[0] + "/data/" + parts[1]
