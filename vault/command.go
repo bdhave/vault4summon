@@ -12,7 +12,7 @@ func Version() string {
 }
 
 func RetrieveSecret(argument string) (string, error) {
-	client, err := configureClient()
+	client, err := api.NewClient(nil)
 	if err != nil {
 		return "", err
 	}
@@ -40,26 +40,6 @@ func RetrieveSecret(argument string) (string, error) {
 
 func isMetadataPresent(secret *api.Secret) bool {
 	return secret.Data["metadata"] != nil
-}
-
-func configureClient() (*api.Client, error) {
-	//todo use default config
-	// todo remove default values, may be load more values needed dor a hardened vault deployment
-	const EnvVaultAddress = "VAULT_ADDR"
-	const EnvVaultToken = "VAULT_TOKEN"
-	var vaultUrl = common.GetEnv(EnvVaultAddress, "http://localhost:8200")
-	var vaultToken = common.GetEnv(EnvVaultToken, "myRootToken")
-
-	config := &api.Config{
-		Address: vaultUrl,
-	}
-	client, err := api.NewClient(config)
-	if err != nil {
-		return nil, err
-	}
-
-	client.SetToken(vaultToken)
-	return client, err
 }
 
 func getSecrets(variableID *common.VariableID, client *api.Client, isVaultEngineV2 bool) (*api.Secret, error) {
@@ -109,7 +89,7 @@ func normalizePath(path string, isVaultEngineV2 bool) string {
 	}
 	var parts = strings.SplitN(path, "/", 2)
 	if len(parts) < 2 {
-		common.PrintAndExit(fmt.Errorf("variableID path  %q MUST contains at least one '/' .", path))
+		common.PrintAndExit(fmt.Errorf("variableID path %q MUST contains at least one '/'", path))
 	}
 
 	return parts[0] + "/data/" + parts[1]
