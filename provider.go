@@ -22,7 +22,7 @@ func main() {
 	}
 
 	if err != nil {
-		common.PrintAndExit(err)
+		common.Exit(err)
 
 	}
 	common.PrintSecret(result)

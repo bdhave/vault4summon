@@ -24,7 +24,7 @@ func Sanitize(s string) (string, string) {
 	s = strings.TrimSpace(s)
 	countCross := strings.Count(s, "#")
 	if countCross > 1 {
-		PrintAndExit(fmt.Errorf("variableID %q contains %d '#'. Maximum ONE '#' is allowed", s, countCross))
+		Exit(fmt.Errorf("variableID %q contains %d '#'. Maximum ONE '#' is allowed", s, countCross))
 	}
 
 	var path = s
@@ -40,7 +40,7 @@ func Sanitize(s string) (string, string) {
 
 	var length = len(parts)
 	if len(key) == 0 && length == 1 {
-		PrintAndExit(fmt.Errorf("variableID %q DOESN'T contain any '/' or '#'", s))
+		Exit(fmt.Errorf("variableID %q DOESN'T contain any '/' or '#'", s))
 	}
 	path = ""
 
