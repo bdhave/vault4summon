@@ -1,4 +1,6 @@
-FROM vault
+FROM vault as vaultUpdated
 RUN apk --no-cache -U upgrade
 
+FROM vaultUpdated
+WORKDIR .
 
