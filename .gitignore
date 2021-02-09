@@ -4,3 +4,9 @@
 /privatenotes/
 initialization.json
 /vaultserver/certificates/
+/vaultserver/volumes/transit/files
+/vaultserver/volumes/transit/logs
+/vaultserver/volumes/transit/audit
+/vaultserver/volumes/vault/files
+/vaultserver/volumes/vault/logs
+/vaultserver/volumes/vault/audit

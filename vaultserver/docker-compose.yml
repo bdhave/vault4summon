@@ -1,0 +1,64 @@
+version: '3.8'
+services:
+
+  vaulttransit:
+
+    build:
+      context: ""
+      dockerfile: dockerfile
+
+    environment:
+      - VAULT_ADDR=http://localhost:8200
+
+    container_name: vaulttransit
+
+    networks:
+      - vault
+
+    ports:
+      - "8200:8200"
+
+    restart: always
+
+    volumes:
+      - ./volumes/transit/logs:/vault/logs
+      - ./volumes/transit/files:/vault/files
+      - ./volumes/transit/config:/vault/config
+
+    cap_add:
+      - IPC_LOCK
+
+      entrypoint: vault server -config=/vault/config/vault.json
+
+  vault:
+
+    build:
+      context: ""
+      dockerfile: dockerfile
+
+    environment:
+      - VAULT_ADDR=http://vault:8100
+
+    container_name: vault
+
+    networks:
+      - vault
+
+    ports:
+      - "8100:8200"
+
+    restart: always
+
+    volumes:
+      - ./volumes/vault/logs:/vault/logs
+      - ./volumes/vault/files:/vault/files
+      - ./volumes/vault/config:/vault/config
+
+    cap_add:
+      - IPC_LOCK
+
+    entrypoint: vault server -config=/vault/config/vault.json
+
+networks:
+  vault:
+    name: vault
