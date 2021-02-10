@@ -7,87 +7,72 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 )
 
 type status struct {
-	initialized bool
-	sealed      bool
-	version     string
+	Initialized bool   `json:"initialized"`
+	Sealed      bool   `json:"sealed"`
+	Version     string `json:"version"`
 }
 
 type initialization struct {
-	Seals       []string
-	RootToken   string
-	Initialized bool
-	Sealed      bool
+	Seals     []string `json:"unseal_keys_b64"`
+	RootToken string   `json:"root_token"`
 }
 
 type seal struct {
-	sealed   bool
-	progress int64
+	Sealed   bool   `json:"sealed"`
+	Progress string `json:"progress"`
 }
 
-const filename = "/vault/config/initialization.json"
+const filename = "initialization.json"
 
 func main() {
 
 	var status = getStatus()
 	var initialization *initialization
-	if !status.initialized {
+	if !status.Initialized {
 		initialization = doInit()
 		status = getStatus()
 	}
 
-	if status.sealed {
+	if status.Sealed {
 		status = doUnseal(initialization)
 	}
 
-	if status.sealed {
-		exitIfError(fmt.Errorf("cannot useal vault"), nil)
+	if status.Sealed {
+		exitIfError(fmt.Errorf("cannot unseal vault"), nil)
 	}
 }
 
 func getStatus() *status {
-	results := execute("vault", "status")
+	exitCodes := append(make([]int, 3), 0, 1, 2)
+	jsonData := execute("vault",
+		exitCodes,
+		"status", "-format", "json")
 
-	var initialized, _ = strconv.ParseBool(parseResult(results, "Initialized", " "))
-	var sealed, _ = strconv.ParseBool(parseResult(results, "Sealed", " "))
-
-	status := &status{
-		initialized,
-		sealed,
-		parseResult(results, "Version", " "),
-	}
+	status := &status{}
+	err := json.Unmarshal(jsonData, status)
+	exitIfError(err, nil)
 
 	return status
 }
 
 func doInit() *initialization {
-	results := execute("vault", "init")
-
-	var seals []string
-	for i := 1; i < len(results); i++ {
-		if strings.Contains(results[i], "Unseal Key") {
-			seals = append(seals, strings.Split(results[i], ":")[1])
-		}
-	}
-	initialized, _ := strconv.ParseBool(parseResult(results, "Initialized", ":"))
-	sealed, _ := strconv.ParseBool(parseResult(results, "Sealed", ":"))
-
-	initialization := &initialization{
-		seals,
-		parseResult(results, "Root Token", ":"),
-		initialized,
-		sealed,
-	}
-	if initialization.Initialized && initialization.Sealed && len(initialization.Seals) < 1 {
+	jsonData := execute("vault",
+		nil,
+		"operator", "init", "-format", "json")
+	var initialization = &initialization{}
+	err := json.Unmarshal(jsonData, initialization)
+	if err != nil || len(initialization.Seals) < 1 {
 		exitIfError(fmt.Errorf("no seals available"), nil)
 	}
 
-	var jsonData, err = json.Marshal(initialization)
+	jsonData, err = json.Marshal(initialization)
 	exitIfError(err, nil)
+	//enc := json.NewEncoder(os.Stdout)
+
 	err = ioutil.WriteFile(filename, jsonData, 0644)
 	exitIfError(err, nil)
 
@@ -97,17 +82,16 @@ func doInit() *initialization {
 func doUnseal(init *initialization) *status {
 
 	if init == nil {
-		init = &initialization{}
 		dat, err := ioutil.ReadFile(filename)
 		exitIfError(err, nil)
 		err = json.Unmarshal(dat, init)
 		exitIfError(err, nil)
 	}
 
-	if init.Sealed {
+	if getStatus().Sealed && init != nil && init.Seals != nil {
 		for i := 0; i < len(init.Seals); i++ {
 			seal := doOneUnseal(init.Seals[i])
-			if !seal.sealed {
+			if !seal.Sealed {
 				break
 			}
 		}
@@ -117,15 +101,49 @@ func doUnseal(init *initialization) *status {
 }
 
 func doOneUnseal(value string) *seal {
-	results := execute("vault", "init", "unseal", value)
-	var sealed, _ = strconv.ParseBool(parseResult(results, "Sealed", ":"))
-	var progress, _ = strconv.ParseInt(parseResult(results, "Progress", ":"), 10, 32)
-	seal := &seal{
-		sealed,
-		progress,
-	}
+	jsonData := execute("vault",
+		nil,
+		"operator", "unseal", "-format", "json", value)
+	seal := &seal{}
+	_ = json.Unmarshal(jsonData, seal)
 
 	return seal
+}
+
+func execute(command string, ignoredExitCode []int, args ...string) []byte {
+	var err error
+	command, err = exec.LookPath(command)
+	exitIfError(err, nil)
+
+	cmd := exec.Command(command, args...)
+	cmd.Env = os.Environ()
+	cmd.Stderr = &bytes.Buffer{}
+
+	out, err := cmd.Output()
+	if err != nil {
+		exitError := err.(*exec.ExitError)
+		exitCode := exitError.ExitCode()
+		if ignoredExitCode != nil {
+			for i := 0; i < len(ignoredExitCode); i++ {
+				if ignoredExitCode[i] == exitCode {
+					return out
+				}
+			}
+		}
+		if exitCode == 1 {
+
+		}
+		if exitCode == 2 {
+
+		}
+		/*
+			Local errors such as incorrect flags, failed validations, or wrong numbers of arguments return an exit code of 1.
+			Any remote errors such as API failures, bad TLS, or incorrect API parameters return an exit status of 2
+		*/
+		exitIfError(err, exitError.Stderr)
+	}
+
+	return out
 }
 
 func exitIfError(err error, errOutput []byte) {
@@ -137,35 +155,9 @@ func exitIfError(err error, errOutput []byte) {
 	os.Exit(1)
 }
 
-func execute(command string, args ...string) []string {
-	var err error
-	command, err = exec.LookPath(command)
-	exitIfError(err, nil)
-
-	cmd := exec.Command(command, args...)
-	cmd.Env = os.Environ()
-	cmd.Stderr = &bytes.Buffer{}
-
-	var out []byte
-	out, err = cmd.Output()
-	exitIfError(err, out)
-
-	return sliceOutputStream(out)
-}
-
 func sliceOutputStream(out []byte) []string {
 	if out == nil {
 		return nil
 	}
 	return strings.Split(string(out), "\n")
-}
-
-func parseResult(array []string, key string, separator string) string {
-	for i := 0; i < len(array); i++ {
-		if strings.Contains(array[i], key) {
-			var parts = strings.Split(array[i], separator)
-			return strings.TrimSpace(parts[1])
-		}
-	}
-	return ""
 }
