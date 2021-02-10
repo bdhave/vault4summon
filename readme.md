@@ -2,7 +2,7 @@
 
 `This project is distributed under the terms of the European Union Public Licence (EUPL) Version 1.2 or newer.`
 
-You can find the latest version of the
+You can find the latest version of the EUPL
 licence [here](https://ec.europa.eu/isa2/solutions/european-union-public-licence-eupl_en).
 
 **WARNING: the current code was only tested with a Hashicorp Vault Server in development mode.**
@@ -12,12 +12,13 @@ closed**
 
 ## Quick start
 
-* Build or download Vault4Summon
+* Build or download vault4summon
   * `go build`
 * Install
   * Copy `vault4sumomon` to `/usr/local/lib/summon/`
 * Configure 
-  * Set the [environment variables](https://www.vaultproject.io/docs/commands#environment-variables) to access Hashicorp Vault
+  * Set the [environment variables](https://www.vaultproject.io/docs/commands#environment-variables)
+    to access Hashicorp Vault
     * `VAULT_ADDR`: e.g. https://127.0.0.1:8200/.
     * `VAULT_TOKEN`: e.g. 1234
 * Use Summon
@@ -48,7 +49,8 @@ The Vault CLI to retrieve a secret is
 
 This provider are 2 implemented formats for Variable ID:
 
-* secret/name#mysecretkeypath as sed by [AWS Secrets Manager provider](https://github.com/cyberark/summon-aws-secrets)
+* secret/name#mysecretkeypath as used 
+  by [AWS Secrets Manager provider](https://github.com/cyberark/summon-aws-secrets)
 * secret/name/mysecretkeypath as used
   by [Keepass kdbx database file provider](https://github.com/mskarbek/summon-keepass)
 
