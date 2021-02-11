@@ -3,3 +3,6 @@
 .idea
 *.iml
 vault4summon
+/privatenotes/
+/initialization.json
+/vaultserver/certificates/
