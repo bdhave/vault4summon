@@ -7,8 +7,8 @@ licence [here](https://ec.europa.eu/isa2/solutions/european-union-public-licence
 
 **WARNING: the current code was only tested with a Hashicorp Vault Server in development mode.**
 
-**It must therefore be considered as a Proof of Concept, and it is not intended to be used in production until issue 1 is
-closed**
+**It must therefore be considered as a Proof of Concept, and it is not intended to be used in production 
+until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084) is  closed**
 
 ## Quick start
 
