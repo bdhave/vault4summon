@@ -19,7 +19,8 @@ func RetrieveSecret(argument string) (string, error) {
 
 	// use KvV2 as a first try
 	var isVaultEngineV2 = true
-	var variableId = common.NewVariableID(argument)
+	var variableId *common.VariableID
+	variableId, err = common.NewVariableID(argument)
 	secret, err := getSecrets(variableId, client, true)
 	if err != nil {
 		return "", err
