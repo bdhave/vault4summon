@@ -37,7 +37,7 @@ func sanitize(argument string) (string, string, error) {
 		path = arguments[0]
 		key = arguments[1]
 		if strings.Count(key, "/") > 0 {
-			return "", "", fmt.Errorf("variableID %q AWS format with a '/' after the '#'", argument)
+			return "", "", fmt.Errorf("variableID %q AWS format with a slash after the '#'", argument)
 		}
 		if len(key) < 1 {
 			return "", "", fmt.Errorf("variableID %q AWS format ends with '#'", argument)
@@ -48,7 +48,7 @@ func sanitize(argument string) (string, string, error) {
 	var parts = strings.Split(path, "/")
 
 	if len(parts) == 1 {
-		return "", "", fmt.Errorf("variableID %q DOESN'T contain any '/' or '#'", argument)
+		return "", "", fmt.Errorf("variableID %q DOESN'T contain any slash or '#'", argument)
 	}
 
 	if len(key) == 0 {
@@ -63,7 +63,7 @@ func sanitize(argument string) (string, string, error) {
 
 	for i := 0; i < len(parts); i++ {
 		if len(parts[i]) < 1 {
-			return "", "", fmt.Errorf("argument %q contains leading slash or ending slash or double //", argument)
+			return "", "", fmt.Errorf("argument %q contains leading slash or ending slash or double slashes", argument)
 		}
 	}
 
