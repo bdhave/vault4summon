@@ -8,10 +8,11 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
-const sealedVaultStatusCommandExitCode = 2
+const sealedVaultStatusCommandExitCode int = 2
 
 type status struct {
 	Initialized bool   `json:"initialized"`
@@ -32,15 +33,29 @@ type seal struct {
 const filename = "initialization.json"
 
 func main() {
+	var fullFileName = filepath.Join(os.Getenv("ROOT4VAULT"), filename)
+	const vaultAddr = "VAULT_ADDR"
+	if len(os.Getenv(vaultAddr)) == 0 {
+		_, _ = os.Stdout.WriteString("VAULT_ADDR environment variable is not defined, set 'http://localhost:8200' as default\n")
+		_ = os.Setenv(vaultAddr, "http://localhost:8200")
+	}
 
 	var status = getStatus()
+
 	var initialization *initialization
 	if !status.Initialized {
-		initialization = doInit()
+		initialization = doInit(fullFileName)
 		status = getStatus()
 	}
 
 	if status.Sealed {
+		if initialization == nil {
+			dat, err := ioutil.ReadFile(fullFileName)
+			exitIfError(err)
+			err = json.Unmarshal(dat, initialization)
+			exitIfError(err)
+		}
+
 		status = doUnseal(initialization)
 	}
 
@@ -50,7 +65,7 @@ func main() {
 }
 
 func getStatus() *status {
-	exitCodes := append(make([]int, 1), sealedVaultStatusCommandExitCode)
+	var exitCodes = []int{sealedVaultStatusCommandExitCode}
 	jsonData := execute("vault",
 		exitCodes,
 		"status", "-format", "json")
@@ -58,11 +73,10 @@ func getStatus() *status {
 	status := &status{}
 	err := json.Unmarshal(jsonData, status)
 	exitIfError(err)
-
 	return status
 }
 
-func doInit() *initialization {
+func doInit(fullFileName string) *initialization {
 	jsonData := execute("vault",
 		nil,
 		"operator", "init", "-format", "json")
@@ -76,21 +90,13 @@ func doInit() *initialization {
 	exitIfError(err)
 	//enc := json.NewEncoder(os.Stdout)
 
-	err = ioutil.WriteFile(filename, jsonData, 0644)
+	err = ioutil.WriteFile(fullFileName, jsonData, 0644)
 	exitIfError(err)
 
 	return initialization
 }
 
 func doUnseal(init *initialization) *status {
-
-	if init == nil {
-		dat, err := ioutil.ReadFile(filename)
-		exitIfError(err)
-		err = json.Unmarshal(dat, init)
-		exitIfError(err)
-	}
-
 	if getStatus().Sealed && init != nil && init.Seals != nil {
 		for i := 0; i < len(init.Seals); i++ {
 			seal := doOneUnseal(init.Seals[i])
@@ -136,7 +142,7 @@ func execute(command string, ignoredExitCode []int, args ...string) []byte {
 			}
 		}
 
-		exitIfError(newCommandError(exitError))
+		exitIfError(newCommandError(exitError, out, command, args))
 	}
 
 	return out
@@ -146,65 +152,50 @@ func exitIfError(err error) {
 	if err == nil {
 		return
 	}
-
-	var exitCode int = 1
-	var exitError *exec.ExitError
-	if errors.As(err, &exitError) {
-		exitCode = exitError.ExitCode()
-		_ = sliceOutputStream(exitError.Stderr)
-		_, _ = os.Stderr.Write([]byte(err.Error()))
+	var commandError *CommandError
+	_, _ = os.Stdout.Write([]byte(err.Error()))
+	if errors.As(err, &commandError) {
+		os.Exit(commandError.exitCode)
 	}
-	os.Exit(exitCode)
-
-}
-func sliceOutputStream(out []byte) []string {
-	if out == nil {
-		return nil
-	}
-	return strings.Split(string(out), "\n")
+	os.Exit(-1)
 }
 
 type CommandError struct {
-	err *exec.ExitError
+	err       *exec.ExitError
+	exitCode  int
+	command   string
+	args      []string
+	output    []byte
+	outputErr []byte
 }
 
 func (e *CommandError) Error() string {
-	exitCode := e.err.ExitCode()
-	if exitCode == 1 {
-		// Local errors such as incorrect flags, failed validations, or wrong numbers of arguments
-	}
-	if exitCode == 2 {
-		// Any remote errors such as API failures, bad TLS, or incorrect API parameters
+	exitCodeDescription := ""
+	if e.exitCode == 1 {
+		exitCodeDescription = "\n\texitCode was 1, VAULT description: Local errors such as incorrect flags, failed validations, or wrong numbers of arguments"
+	} else if e.exitCode == 2 {
+		exitCodeDescription = "\n\texitCode was 2, VAULT description: Any remote errors such as API failures, bad TLS, or incorrect API parameters"
+	} else if e.exitCode != 0 {
+		exitCodeDescription = fmt.Sprintf("\n\tExitCode was %v", e.exitCode)
 	}
 
-	return ": " + e.err.Error()
-
+	args := strings.Join(e.args, " ")
+	description := fmt.Sprintf("When executing VAULT %s %s %s", e.command, args, exitCodeDescription)
+	var stdout = ""
+	if len(e.output) > 0 {
+		stdout = "\n" + string(e.output)
+	}
+	var stderr = ""
+	if len(e.outputErr) > 0 {
+		stderr = "\nstderr:\n" + string(e.outputErr)
+	}
+	return fmt.Sprintf("%s:\n%s%s%v", description, stdout, stderr, e.err)
 }
 
-func newCommandError(err *exec.ExitError) error {
+func newCommandError(err *exec.ExitError, console []byte, command string, args []string) error {
 	if err == nil {
-		// As a convenience, if err is nil, NewSyscallError returns nil.
+		// As a convenience, if err is nil, newCommandError returns nil.
 		return nil
 	}
-	return &CommandError{err}
+	return &CommandError{err, err.ExitCode(), command, args, console, err.Stderr}
 }
-
-/*
-
-type WrappedError struct {
-    Context string
-    Err     error
-}
-
-func (w *WrappedError) Error() string {
-    return fmt.Sprintf("%s: %v", w.Context, w.Err)
-}
-
-func Wrap(err error, info string) *WrappedError {
-    return &WrappedError{
-        Context: info,
-        Err:     err,
-    }
-}
-
-*/
