@@ -11,7 +11,7 @@ type VariableID struct {
 }
 
 func NewVariableID(argument string) (*VariableID, error) {
-	var path, key, err = Sanitize(argument)
+	var path, key, err = sanitize(argument)
 
 	if err != nil {
 		return nil, err
@@ -23,7 +23,7 @@ func NewVariableID(argument string) (*VariableID, error) {
 	return valuePath, nil
 }
 
-func Sanitize(argument string) (string, string, error) {
+func sanitize(argument string) (string, string, error) {
 	argument = strings.TrimSpace(argument)
 	countCross := strings.Count(argument, "#")
 	if countCross > 1 {
