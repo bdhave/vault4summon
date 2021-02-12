@@ -9,6 +9,7 @@ services:
 
     environment:
       - VAULT_ADDR=http://localhost:8200
+      - ROOT4VAULT=/vault
 
     container_name: vaulttransit
 
@@ -24,6 +25,7 @@ services:
       - ./volumes/transit/logs:/vault/logs
       - ./volumes/transit/files:/vault/files
       - ./volumes/transit/config:/vault/config
+      - ./volumes/transit/config:/vault/audit
 
     cap_add:
       - IPC_LOCK
@@ -38,6 +40,7 @@ services:
 
     environment:
       - VAULT_ADDR=http://vault:8100
+      - ROOT4VAULT=/vault
 
     container_name: vault
 
@@ -53,6 +56,7 @@ services:
       - ./volumes/vault/logs:/vault/logs
       - ./volumes/vault/files:/vault/files
       - ./volumes/vault/config:/vault/config
+      - ./volumes/vault/config:/vault/audit
 
     cap_add:
       - IPC_LOCK
