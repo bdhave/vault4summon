@@ -1,6 +1,8 @@
+.idea/
+.git/
 target/
-test/
-temp/
+privatenotes/
+vaultserver/
 .gitignore
 LICENSE
 startVaultDEV.sh
