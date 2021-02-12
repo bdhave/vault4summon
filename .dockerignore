@@ -1,9 +1,11 @@
 .idea/
 .git/
+.github/
 target/
 privatenotes/
 vaultserver/
 .gitignore
 LICENSE
-startVaultDEV.sh
+startVaultDEVContainer.sh
+startSummonContainer.sh
 readme.md
