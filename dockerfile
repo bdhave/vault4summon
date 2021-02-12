@@ -1,12 +1,15 @@
 FROM golang:alpine as golang-base
-RUN apk -U upgrade
-
+RUN apk -U upgrade && mkdir gotemp
+workdir gotemp
+COPY go.mod .
+RUN go mod download
+WORKDIR ..
+RUN rm -r gotemp
 
 # compile vault4summon
 FROM golang-base as builder
 ADD . /source
 WORKDIR /source
-RUN go mod download all 
 RUN go build -o target/vault4summon
 
 # create an alpine image with bash, Hashicorp Vault & CyberArk Summon
