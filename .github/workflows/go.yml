@@ -22,7 +22,7 @@ jobs:
       run: go build -o vault4summon
 
     - name: Test
-      run: go test
+      run:  go test ./...
 
     - uses: actions/upload-artifact@v2
       with:
