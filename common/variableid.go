@@ -45,32 +45,27 @@ func Sanitize(argument string) (string, string, error) {
 
 	}
 
-	// sanitize for leading, trailing and concatenated '/'
 	var parts = strings.Split(path, "/")
 
-	var length = len(parts)
-	if length == 1 {
+	if len(parts) == 1 {
 		return "", "", fmt.Errorf("variableID %q DOESN'T contain any '/' or '#'", argument)
 	}
-	path = ""
 
 	if len(key) == 0 {
-		length--
-		key = parts[length]
-	}
-
-	for i := 0; i < length; i++ {
-		if len(parts[i]) < 1 {
-			return "", "", fmt.Errorf("argument %q contains leading slash or ending slash or double //", argument)
-		}
-		path += parts[i]
-		if i != length-1 {
-			path += "/"
-		}
+		key = parts[len(parts)-1]
+		// remove key form parts
+		parts = parts[:len(parts)-1]
 	}
 
 	if len(key) < 1 {
 		return "", "", fmt.Errorf("variableID %q key is empty", argument)
 	}
-	return path, key, nil
+
+	for i := 0; i < len(parts); i++ {
+		if len(parts[i]) < 1 {
+			return "", "", fmt.Errorf("argument %q contains leading slash or ending slash or double //", argument)
+		}
+	}
+
+	return strings.Join(parts, "/"), key, nil
 }
