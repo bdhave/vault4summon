@@ -5,4 +5,5 @@ vault audit enable file file_path=$ROOT4VAULT/logs/audit/audit.log
 vault secrets enable transit
 vault write -f transit/keys/autounseal
 vault policy write transit-policy $ROOT4VAULT/config/autounseal.hcl
+vault token create -policy="autounseal" -wrap-ttl=120
 
