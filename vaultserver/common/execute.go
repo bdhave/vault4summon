@@ -12,7 +12,9 @@ import (
 func Execute(command string, ignoredExitCode []int, args ...string) ([]byte, error) {
 	var err error
 	command, err = exec.LookPath(command)
-	ExitIfError(err)
+	if err != nil {
+		return nil, err
+	}
 
 	cmd := exec.Command(command, args...)
 	cmd.Env = os.Environ()
@@ -36,18 +38,6 @@ func Execute(command string, ignoredExitCode []int, args ...string) ([]byte, err
 	}
 
 	return out, nil
-}
-
-func ExitIfError(err error) {
-	if err == nil {
-		return
-	}
-	var commandError *CommandError
-	_, _ = os.Stdout.Write([]byte(err.Error()))
-	if errors.As(err, &commandError) {
-		os.Exit(commandError.ExitCode)
-	}
-	os.Exit(-1)
 }
 
 type CommandError struct {

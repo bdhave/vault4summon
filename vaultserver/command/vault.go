@@ -2,8 +2,10 @@ package command
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"vaultserver/common"
 )
 
@@ -25,73 +27,104 @@ type seal struct {
 	Progress string `json:"progress"`
 }
 
-func GetStatus() *status {
-	var exitCodes = []int{sealedVaultStatusCommandExitCode}
+func GetStatus() (*status, error) {
 	jsonData, err := common.Execute("vault",
-		exitCodes,
+		[]int{sealedVaultStatusCommandExitCode},
 		"status", "-format", "json")
-	//todo check err
-
+	if err != nil {
+		return nil, err
+	}
 	status := &status{}
 	err = json.Unmarshal(jsonData, status)
-	common.ExitIfError(err)
-	return status
+	return status, err
 }
 
-func DoInitialization(fullFileName string) *Initialization {
+func DoInitialization(fullFileName string) (*Initialization, error) {
 	var jsonData, err = common.Execute("vault",
 		nil,
 		"operator", "init", "-format", "json")
-
-	//todo check err
+	if err = wrapCommandError(err); err != nil {
+		return nil, err
+	}
 	var initialization = &Initialization{}
 	err = json.Unmarshal(jsonData, initialization)
-	if err != nil || len(initialization.Seals) < 1 {
-		common.ExitIfError(fmt.Errorf("no seals available"))
+	if err != nil {
+		return nil, err
+	}
+	if len(initialization.Seals) < 1 {
+		return nil, fmt.Errorf("no seals available")
 	}
 
 	jsonData, err = json.Marshal(initialization)
-	common.ExitIfError(err)
-	//enc := json.NewEncoder(os.Stdout)
-
-	err = ioutil.WriteFile(fullFileName, jsonData, 0644)
-	common.ExitIfError(err)
-
-	return initialization
-}
-
-func DoUnseal(initialization *Initialization, fullFileName string) *status {
-	if initialization == nil {
-		dat, err := ioutil.ReadFile(fullFileName)
-		common.ExitIfError(err)
-		err = json.Unmarshal(dat, initialization)
-		common.ExitIfError(err)
+	if err != nil {
+		return nil, err
 	}
 
-	if GetStatus().Sealed && initialization != nil && initialization.Seals != nil {
+	err = ioutil.WriteFile(fullFileName, jsonData, 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	return initialization, err
+}
+
+func DoUnseal(initialization *Initialization, fullFileName string) (*status, error) {
+	if initialization == nil {
+		dat, err := ioutil.ReadFile(fullFileName)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(dat, initialization)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	status, err := GetStatus()
+	if err != nil {
+		return nil, err
+	}
+
+	if status.Sealed && initialization != nil && initialization.Seals != nil {
 		for i := 0; i < len(initialization.Seals); i++ {
-			seal := doOneUnseal(initialization.Seals[i])
+			seal, err := doOneUnseal(initialization.Seals[i])
+			if err = wrapCommandError(err); err != nil {
+				return nil, err
+			}
+
 			if !seal.Sealed {
 				break
 			}
 		}
 	}
 
-	return GetStatus()
+	status, err = GetStatus()
+	return status, err
 }
 
-func doOneUnseal(value string) *seal {
+func doOneUnseal(value string) (*seal, error) {
 	jsonData, err := common.Execute("vault",
 		nil,
 		"operator", "unseal", "-format", "json", value)
-	//todo check err
-	if err != nil {
-
+	if err = wrapCommandError(err); err != nil {
+		return nil, err
 	}
-	seal := &seal{}
-	_ = json.Unmarshal(jsonData, seal)
 
-	return seal
+	seal := &seal{}
+	err = json.Unmarshal(jsonData, seal)
+
+	return seal, err
+}
+
+func wrapCommandError(err error) error {
+	if err == nil {
+		return nil
+	}
+	var commandError *common.CommandError
+	if errors.As(err, &commandError) {
+		err = newVaultError(commandError)
+	}
+	return err
 }
 
 type vaultError struct {
@@ -117,4 +150,17 @@ func newVaultError(err *common.CommandError) error {
 		vaultDescription = fmt.Sprintf("\n\tExitCode was %v", err.ExitCode)
 	}
 	return &vaultError{*err, vaultDescription}
+}
+
+func ExitIfError(err error) {
+	if err == nil {
+		return
+	}
+	var commandError *common.CommandError
+	if errors.As(err, &commandError) {
+		_, _ = os.Stdout.Write([]byte(err.Error()))
+		os.Exit(commandError.ExitCode)
+	}
+	_, _ = os.Stdout.Write([]byte(err.Error()))
+	os.Exit(-1)
 }
