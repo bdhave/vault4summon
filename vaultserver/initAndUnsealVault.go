@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"vaultserver/command"
-	"vaultserver/common"
 )
 
 const filename = "Initialization.json"
@@ -18,19 +17,22 @@ func main() {
 		_ = os.Setenv(vaultAddr, "http://localhost:8200")
 	}
 
-	var status = command.GetStatus()
+	var status, err = command.GetStatus()
+	command.ExitIfError(err)
 
 	var initialization *command.Initialization
 	if !status.Initialized {
-		initialization = command.DoInitialization(fullFileName)
-		status = command.GetStatus()
+		initialization, err = command.DoInitialization(fullFileName)
+		status, err = command.GetStatus()
+		command.ExitIfError(err)
 	}
 
 	if status.Sealed {
-		status = command.DoUnseal(initialization, fullFileName)
+		status, err = command.DoUnseal(initialization, fullFileName)
+		command.ExitIfError(err)
 	}
 
 	if status.Sealed {
-		common.ExitIfError(fmt.Errorf("cannot unseal vault"))
+		command.ExitIfError(fmt.Errorf("cannot unseal vault"))
 	}
 }
