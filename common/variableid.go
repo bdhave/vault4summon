@@ -27,7 +27,7 @@ func sanitize(argument string) (string, string, error) {
 	argument = strings.TrimSpace(argument)
 	countCross := strings.Count(argument, "#")
 	if countCross > 1 {
-		return "", "", fmt.Errorf("variableID %q contains %d '#'. Maximum ONE '#' is allowed", argument, countCross)
+		return "", "", fmt.Errorf("SYNTAX ERROR: variableID %q contains %d '#'. Maximum ONE '#' is allowed", argument, countCross)
 	}
 
 	var path = argument
@@ -37,18 +37,16 @@ func sanitize(argument string) (string, string, error) {
 		path = arguments[0]
 		key = arguments[1]
 		if strings.Count(key, "/") > 0 {
-			return "", "", fmt.Errorf("variableID %q AWS format with a slash after the '#'", argument)
+			return "", "", fmt.Errorf("SYNTAX ERROR: variableID %q (AWS format) with a slash after the '#'", argument)
 		}
 		if len(key) < 1 {
-			return "", "", fmt.Errorf("variableID %q AWS format ends with '#'", argument)
+			return "", "", fmt.Errorf("SYNTAX ERROR: variableID %q (AWS format) ends with '#'", argument)
 		}
-
 	}
 
 	var parts = strings.Split(path, "/")
-
 	if len(parts) == 1 {
-		return "", "", fmt.Errorf("variableID %q DOESN'T contain any slash or '#'", argument)
+		return "", "", fmt.Errorf("SYNTAX ERROR: variableID %q DOESN'T contain any slash or '#'", argument)
 	}
 
 	if len(key) == 0 {
@@ -58,12 +56,12 @@ func sanitize(argument string) (string, string, error) {
 	}
 
 	if len(key) < 1 {
-		return "", "", fmt.Errorf("variableID %q key is empty", argument)
+		return "", "", fmt.Errorf("SYNTAX ERROR: variableID %q key is empty", argument)
 	}
 
 	for i := 0; i < len(parts); i++ {
 		if len(parts[i]) < 1 {
-			return "", "", fmt.Errorf("argument %q contains leading slash or ending slash or double slashes", argument)
+			return "", "", fmt.Errorf("SYNTAX ERROR: variableID %q contains leading slash or ending slash or double slashes", argument)
 		}
 	}
 
