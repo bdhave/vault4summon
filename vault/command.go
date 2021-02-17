@@ -8,11 +8,13 @@ import (
 )
 
 func Version() string {
-	return "0.1"
+	return "0.2"
 }
 
 func RetrieveSecret(argument string) (string, error) {
-	client, err := api.NewClient(nil)
+	var err error
+	var client *api.Client
+	client, err = api.NewClient(nil)
 	if err != nil {
 		return "", err
 	}
@@ -21,7 +23,12 @@ func RetrieveSecret(argument string) (string, error) {
 	var isVaultEngineV2 = true
 	var variableId *common.VariableID
 	variableId, err = common.NewVariableID(argument)
-	secret, err := getSecrets(variableId, client, true)
+	if err != nil {
+		return "", err
+	}
+
+	var secret *api.Secret
+	secret, err = getSecrets(variableId, client, true)
 	if err != nil {
 		return "", err
 	}
@@ -90,7 +97,7 @@ func normalizePath(path string, isVaultEngineV2 bool) string {
 	}
 	var parts = strings.SplitN(path, "/", 2)
 	if len(parts) < 2 {
-		common.Exit(fmt.Errorf("variableID path %q MUST contains at least one '/'", path))
+		common.Exit(fmt.Errorf("SYNTAX ERROR: variableID path %q MUST contains at least one '/'", path))
 	}
 
 	return parts[0] + "/data/" + parts[1]
