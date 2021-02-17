@@ -1,8 +1,6 @@
 /target/
-/test/
-.idea
+/.idea/
 *.iml
-vault4summon
 /privatenotes/
-/initialization.json
+initialization.json
 /vaultserver/certificates/
