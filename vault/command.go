@@ -51,12 +51,11 @@ func isMetadataPresent(secret *api.Secret) bool {
 }
 
 func getSecrets(variableID *common.VariableID, client *api.Client, isVaultEngineV2 bool) (*api.Secret, error) {
-
 	var path = normalizePath(variableID.Path, isVaultEngineV2)
 	secret, err := client.Logical().Read(path)
 
 	if err != nil {
-		return secret, err
+		return nil, err
 	}
 	if secret == nil {
 		return nil, fmt.Errorf("no secret for path %s\n", variableID.Path)
@@ -96,9 +95,5 @@ func normalizePath(path string, isVaultEngineV2 bool) string {
 		return path
 	}
 	var parts = strings.SplitN(path, "/", 2)
-	if len(parts) < 2 {
-		common.Exit(fmt.Errorf("SYNTAX ERROR: variableID path %q MUST contains at least one '/'", path))
-	}
-
 	return parts[0] + "/data/" + parts[1]
 }

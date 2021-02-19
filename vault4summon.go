@@ -7,10 +7,10 @@ import (
 )
 
 func main() {
-	common.CheckArgument()
+	err := common.CheckArgument()
+	common.ExitIfError(err)
 
 	var result string
-	var err error
 
 	// Get the secret and key name from the argument
 	argument := os.Args[1]
@@ -20,10 +20,6 @@ func main() {
 	default:
 		result, err = vault.RetrieveSecret(argument)
 	}
-
-	if err != nil {
-		common.Exit(err)
-
-	}
+	common.ExitIfError(err)
 	common.PrintSecret(result)
 }
