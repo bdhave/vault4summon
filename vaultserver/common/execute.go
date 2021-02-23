@@ -18,7 +18,8 @@ func Execute(command string, ignoredExitCode []int, args ...string) ([]byte, err
 
 	cmd := exec.Command(command, args...)
 	cmd.Env = os.Environ()
-	cmd.Stderr = &bytes.Buffer{}
+	stderr := &bytes.Buffer{}
+	cmd.Stderr = stderr
 
 	out, err := cmd.Output()
 	if err != nil {
@@ -34,38 +35,38 @@ func Execute(command string, ignoredExitCode []int, args ...string) ([]byte, err
 			}
 		}
 
-		return nil, newCommandError(exitError, out, command, args)
+		return nil, newCommandError(exitError, out, stderr.Bytes(), command, args)
 	}
 
 	return out, nil
 }
 
 type CommandError struct {
-	err       *exec.ExitError
-	ExitCode  int
-	command   string
-	args      []string
-	output    []byte
-	outputErr []byte
+	err      *exec.ExitError
+	ExitCode int
+	command  string
+	args     []string
+	stdout   []byte
+	stderr   []byte
 }
 
 func (e *CommandError) Error() string {
 	description := fmt.Sprintf("When executing %s %s", e.command, strings.Join(e.args, " "))
 	var stdout = ""
-	if len(e.output) > 0 {
-		stdout = "\n" + string(e.output)
+	if len(e.stdout) > 0 {
+		stdout = "\n" + string(e.stdout)
 	}
 	var stderr = ""
-	if len(e.outputErr) > 0 {
-		stderr = "\nstderr:\n" + string(e.outputErr)
+	if len(e.stderr) > 0 {
+		stderr = "\nstderr:\n" + string(e.stderr)
 	}
 	return fmt.Sprintf("%s:\n%s%s%v", description, stdout, stderr, e.err)
 }
 
-func newCommandError(err *exec.ExitError, console []byte, command string, args []string) error {
+func newCommandError(err *exec.ExitError, console []byte, stderr []byte, command string, args []string) error {
 	if err == nil {
 		// As a convenience, if err is nil, newCommandError returns nil.
 		return nil
 	}
-	return &CommandError{err, err.ExitCode(), command, args, console, err.Stderr}
+	return &CommandError{err, err.ExitCode(), command, args, console, stderr}
 }

@@ -6,28 +6,69 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"vaultserver/common"
 )
 
-const sealedVaultStatusCommandExitCode int = 2
+const InitializationFilename = "config/initialization.json"
+const VaultAddress = "http://localhost:8200"
+
+const auditFilename = "audit/audit.log"
+const tokenFileName = "token.json"
 
 type status struct {
-	Initialized bool   `json:"initialized"`
-	Sealed      bool   `json:"sealed"`
-	Version     string `json:"version"`
+	Type         string `json:"type"`
+	Initialized  bool   `json:"initialized"`
+	Sealed       bool   `json:"sealed"`
+	Version      string `json:"version"`
+	Nonce        string `json:"nonce"`
+	RecoverySeal bool   `json:"recovery_seal"`
+	StorageType  string `json:"storage_type"`
+	HaEnabled    bool   `json:"ha_enabled"`
 }
 
 type Initialization struct {
-	Seals     []string `json:"unseal_keys_b64"`
-	RootToken string   `json:"root_token"`
+	Seals        []string `json:"unseal_keys_b64"`
+	RecoveryKeys []string `json:"recovery_keys_b64"`
+	RootToken    string   `json:"root_token"`
 }
 
 type seal struct {
-	Sealed   bool   `json:"sealed"`
-	Progress string `json:"progress"`
+	Progress     int    `json:"progress"`
+	Type         string `json:"type"`
+	Initialized  bool   `json:"initialized"`
+	Sealed       bool   `json:"sealed"`
+	Version      string `json:"version"`
+	Nonce        string `json:"nonce"`
+	RecoverySeal bool   `json:"recovery_seal"`
+	StorageType  string `json:"storage_type"`
+	HaEnabled    bool   `json:"ha_enabled"`
+}
+
+type tokenInfo struct {
+	Token           string `json:"token"`
+	Accessor        string `json:"accessor"`
+	WrappedAccessor string `json:"wrapped_accessor"`
+	TTL             int    `json:"ttl"`
+}
+
+type token struct {
+	Duration  int       `json:"lease_duration"`
+	Renewable bool      `json:"renewable"`
+	Tokens    tokenInfo `json:"wrap_info"`
+}
+
+func Setup(address string) {
+	const vaultAddr = "VAULT_ADDR"
+	if len(os.Getenv(vaultAddr)) == 0 {
+		_, _ = os.Stdout.WriteString(vaultAddr + " environment variable is not defined, set 'http://localhost:8200' as default\n")
+		_ = os.Setenv(vaultAddr, address)
+	}
 }
 
 func GetStatus() (*status, error) {
+	const sealedVaultStatusCommandExitCode int = 2
+
 	jsonData, err := common.Execute("vault",
 		[]int{sealedVaultStatusCommandExitCode},
 		"status", "-format", "json")
@@ -39,23 +80,103 @@ func GetStatus() (*status, error) {
 	return status, err
 }
 
-func DoInitialization(fullFileName string) (*Initialization, error) {
+func InitializeTransit(fullFileName string) (*status, *Initialization, error) {
+	status, initialization, err := initialize(fullFileName)
+	if err != nil {
+		return status, initialization, err
+	}
+
+	if len(initialization.Seals) < 1 {
+		return nil, initialization, fmt.Errorf("no seals available")
+	}
+	status, err = Unseal(initialization, fullFileName)
+	err = EnableAudit(filepath.Join(os.Getenv("ROOT4VAULT"), auditFilename))
+	ExitIfError(err)
+	err = enableTransit()
+	ExitIfError(err)
+	status, err = GetStatus()
+	ExitIfError(err)
+	return status, initialization, err
+}
+
+func initialize(fullFileName string) (*status, *Initialization, error) {
 	var jsonData, err = common.Execute("vault",
 		nil,
 		"operator", "init", "-format", "json")
 	if err = wrapCommandError(err); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	var initialization = &Initialization{}
 	err = json.Unmarshal(jsonData, initialization)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	if len(initialization.Seals) < 1 {
-		return nil, fmt.Errorf("no seals available")
+
+	err = os.Setenv("VAULT_TOKEN", initialization.RootToken)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	jsonData, err = json.Marshal(initialization)
+	if err != nil {
+		return nil, initialization, err
+	}
+
+	err = ioutil.WriteFile(fullFileName, jsonData, 0644)
+	if err != nil {
+		return nil, initialization, err
+	}
+	status, err := GetStatus()
+	if err != nil {
+		return nil, initialization, err
+	}
+	return status, initialization, err
+}
+
+func EnableAudit(fullFileName string) error {
+	var _, err = common.Execute("vault",
+		nil,
+		"audit", "enable", "file", "file_path="+fullFileName)
+	if err = wrapCommandError(err); err != nil {
+		return err
+	}
+	return err
+}
+
+func enableTransit() error {
+	var _, err = common.Execute("vault",
+		nil,
+		"secrets", "enable", "transit")
+	if err = wrapCommandError(err); err != nil {
+		return err
+	}
+	_, err = common.Execute("vault",
+		nil,
+		"write", "-f", "transit/keys/autounseal")
+	if err = wrapCommandError(err); err != nil {
+		return err
+	}
+	_, err = common.Execute("vault",
+		nil,
+		"policy", "write", "transit-policy", FullFileName("config/autounseal-policy.hcl"))
+
+	if err = wrapCommandError(err); err != nil {
+		return err
+	}
+
+	_, err = CreateToken(FullFileName(tokenFileName))
+	return err
+}
+
+func CreateToken(fullFileName string) (*token, error) {
+	jsonData, err := common.Execute("vault",
+		nil,
+		"token", "create", "-policy=\"autounseal\"", "-wrap-ttl=120", "-format", "json")
+	if err = wrapCommandError(err); err != nil {
+		return nil, err
+	}
+	token := &token{}
+	err = json.Unmarshal(jsonData, token)
 	if err != nil {
 		return nil, err
 	}
@@ -64,11 +185,15 @@ func DoInitialization(fullFileName string) (*Initialization, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	return initialization, err
+	return token, err
 }
 
-func DoUnseal(initialization *Initialization, fullFileName string) (*status, error) {
+func Unseal(initialization *Initialization, fullFileName string) (*status, error) {
+	status, err := GetStatus()
+	if err != nil || !status.Sealed {
+		return status, err
+	}
+
 	if initialization == nil {
 		dat, err := ioutil.ReadFile(fullFileName)
 		if err != nil {
@@ -80,12 +205,7 @@ func DoUnseal(initialization *Initialization, fullFileName string) (*status, err
 		}
 	}
 
-	status, err := GetStatus()
-	if err != nil {
-		return nil, err
-	}
-
-	if status.Sealed && initialization != nil && initialization.Seals != nil {
+	if initialization != nil {
 		for i := 0; i < len(initialization.Seals); i++ {
 			seal, err := doOneUnseal(initialization.Seals[i])
 			if err = wrapCommandError(err); err != nil {
@@ -99,7 +219,12 @@ func DoUnseal(initialization *Initialization, fullFileName string) (*status, err
 	}
 
 	status, err = GetStatus()
-	return status, err
+	ExitIfError(err)
+
+	if status.Sealed {
+		ExitIfError(fmt.Errorf("cannot unseal vault"))
+	}
+	return status, nil
 }
 
 func doOneUnseal(value string) (*seal, error) {
@@ -122,7 +247,7 @@ func wrapCommandError(err error) error {
 	}
 	var commandError *common.CommandError
 	if errors.As(err, &commandError) {
-		err = newVaultError(commandError)
+		return newVaultError(commandError)
 	}
 	return err
 }
@@ -133,7 +258,7 @@ type vaultError struct {
 }
 
 func (v vaultError) Error() string {
-	panic("implement me")
+	return fmt.Sprintf("Vault ERROR:\n%s", v.err.Error)
 }
 
 func newVaultError(err *common.CommandError) error {
@@ -163,4 +288,14 @@ func ExitIfError(err error) {
 	}
 	_, _ = os.Stdout.Write([]byte(err.Error()))
 	os.Exit(-1)
+}
+
+func FullFileName(fileName string) string {
+	const root4vault = "ROOT4VAULT"
+	rootPath := os.Getenv(root4vault)
+	if len(rootPath) < 1 {
+		_, _ = os.Stdout.WriteString(root4vault + " environment variable is not defined, set './' as default\n")
+		rootPath = "./"
+	}
+	return filepath.Join(rootPath, fileName)
 }

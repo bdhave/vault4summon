@@ -30,7 +30,7 @@ services:
     cap_add:
       - IPC_LOCK
 
-    entrypoint: vault server -config=/vault/config/vault.json
+    entrypoint: vault server -config=/vault/config/vault.hcl
 
   vault:
 
@@ -61,7 +61,7 @@ services:
     cap_add:
       - IPC_LOCK
 
-    entrypoint: vault server -config=/vault/config/vault.json
+    entrypoint: vault server -config=/vault/config/vault.hcl
 
 networks:
   vault:

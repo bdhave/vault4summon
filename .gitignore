@@ -10,3 +10,4 @@ initialization.json
 /vaultserver/volumes/vault/files
 /vaultserver/volumes/vault/logs
 /vaultserver/volumes/vault/audit
+/vaultserver/volumes/transit/token.json
