@@ -22,13 +22,12 @@ func main() {
 
 	var initialization *command.Initialization
 	if !status.Initialized {
-		initialization, err = command.DoInitialization(fullFileName)
-		status, err = command.GetStatus()
+		status, initialization, err = command.InitializeTransit(fullFileName)
 		command.ExitIfError(err)
 	}
 
 	if status.Sealed {
-		status, err = command.DoUnseal(initialization, fullFileName)
+		status, err = command.Unseal(initialization, fullFileName)
 		command.ExitIfError(err)
 	}
 
