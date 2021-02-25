@@ -4,16 +4,21 @@ import (
 	"vaultserver/command"
 )
 
-func main() {
-	command.Setup(command.VaultAddress)
+const vaultAddress = "http://localhost:8100"
 
-	var status, err = command.GetStatus()
+func main() {
+	command.SetupWithToken(vaultAddress)
+
+	_, err := command.UnWrap()
+	command.ExitIfError(err)
+
+	status, err := command.GetStatus()
 	command.ExitIfError(err)
 
 	var initialization *command.Initialization
 	var fullFileName = command.FullFileName(command.InitializationFilename)
 	if !status.Initialized {
-		status, initialization, err = command.InitializeTransit(fullFileName)
+		status, initialization, err = command.InitializeVault(fullFileName)
 	} else if status.Sealed {
 		_, err := command.Unseal(initialization, fullFileName)
 		command.ExitIfError(err)

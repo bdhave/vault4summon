@@ -1,11 +1,15 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"vaultserver/command"
 )
 
+const vaultAddressTransit = "http://localhost:8200"
+
 func main() {
-	command.Setup(command.VaultAddress)
+	command.Setup(vaultAddressTransit)
 
 	var status, err = command.GetStatus()
 	command.ExitIfError(err)
@@ -18,5 +22,8 @@ func main() {
 		_, err := command.Unseal(initialization, fullFileName)
 		command.ExitIfError(err)
 	}
+	token, _, _ := command.CreateToken(command.FullFileName(command.TokenFileName))
+	_, _ = fmt.Fprintf(os.Stdout, "%s", token)
+
 	command.ExitIfError(err)
 }

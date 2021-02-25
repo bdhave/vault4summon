@@ -39,7 +39,7 @@ services:
       dockerfile: dockerfile
 
     environment:
-      - VAULT_ADDR=http://vault:8100
+      - VAULT_ADDR=http://localhost:8100
       - ROOT4VAULT=/vault
 
     container_name: vault
@@ -48,7 +48,7 @@ services:
       - vault
 
     ports:
-      - "8100:8200"
+      - "8100:8100"
 
     restart: always
 

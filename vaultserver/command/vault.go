@@ -11,10 +11,8 @@ import (
 )
 
 const InitializationFilename = "config/initialization.json"
-const VaultAddress = "http://localhost:8200"
-
 const auditFilename = "audit/audit.log"
-const tokenFileName = "token.json"
+const TokenFileName = "token.json"
 
 type status struct {
 	Type         string `json:"type"`
@@ -45,23 +43,47 @@ type seal struct {
 	HaEnabled    bool   `json:"ha_enabled"`
 }
 
-type tokenInfo struct {
+type tokenWrapped struct {
 	Token           string `json:"token"`
 	Accessor        string `json:"accessor"`
 	WrappedAccessor string `json:"wrapped_accessor"`
 	TTL             int    `json:"ttl"`
 }
 
-type token struct {
-	Duration  int       `json:"lease_duration"`
-	Renewable bool      `json:"renewable"`
-	Tokens    tokenInfo `json:"wrap_info"`
+type tokenInfo struct {
+	Duration  int          `json:"lease_duration"`
+	Renewable bool         `json:"renewable"`
+	Token     tokenWrapped `json:"wrap_info"`
+}
+
+func SetupWithToken(address string) {
+	const vaultToken = "VAULT_TOKEN"
+	Setup(address)
+
+	if len(os.Args) > 2 {
+		ExitIfError(errors.New("this application accepts ONE and ONLY ONE argument"))
+	}
+	if len(os.Getenv(vaultToken)) == 0 && len(os.Args) != 2 {
+		ExitIfError(fmt.Errorf(
+			"%s environment variable is not defined, you MUST gives the token as argument or define %s environment variable",
+			vaultToken, vaultToken))
+	}
+	if len(os.Getenv(vaultToken)) == 0 {
+		_ = os.Setenv(vaultToken, os.Args[1])
+	}
+
+	if len(os.Getenv(vaultToken)) == 0 {
+		ExitIfError(fmt.Errorf(
+			"%s environment variable is not defined, you MUST gives the token as argument or define %s environment variable",
+			vaultToken, vaultToken))
+	}
 }
 
 func Setup(address string) {
 	const vaultAddr = "VAULT_ADDR"
 	if len(os.Getenv(vaultAddr)) == 0 {
-		_, _ = os.Stdout.WriteString(vaultAddr + " environment variable is not defined, set 'http://localhost:8200' as default\n")
+
+		_, _ = fmt.Fprintf(os.Stderr, "%s environment variable is not defined, set '%s' as default\n", vaultAddr, address)
 		_ = os.Setenv(vaultAddr, address)
 	}
 }
@@ -99,6 +121,14 @@ func InitializeTransit(fullFileName string) (*status, *Initialization, error) {
 	return status, initialization, err
 }
 
+func InitializeVault(fullFileName string) (*status, *Initialization, error) {
+	status, initialization, err := initialize(fullFileName)
+	if err != nil {
+		return status, initialization, err
+	}
+	return status, initialization, nil
+}
+
 func initialize(fullFileName string) (*status, *Initialization, error) {
 	var jsonData, err = common.Execute("vault",
 		nil,
@@ -115,11 +145,6 @@ func initialize(fullFileName string) (*status, *Initialization, error) {
 	err = os.Setenv("VAULT_TOKEN", initialization.RootToken)
 	if err != nil {
 		return nil, nil, err
-	}
-
-	jsonData, err = json.Marshal(initialization)
-	if err != nil {
-		return nil, initialization, err
 	}
 
 	err = ioutil.WriteFile(fullFileName, jsonData, 0644)
@@ -164,18 +189,23 @@ func enableTransit() error {
 		return err
 	}
 
-	_, err = CreateToken(FullFileName(tokenFileName))
-	return err
+	return nil
 }
 
-func CreateToken(fullFileName string) (*token, error) {
+func CreateToken(fullFileName string) (string, *tokenInfo, error) {
+	token, err := createToken(fullFileName)
+	ExitIfError(err)
+	return token.Token.Token, token, nil
+}
+
+func createToken(fullFileName string) (*tokenInfo, error) {
 	jsonData, err := common.Execute("vault",
 		nil,
-		"token", "create", "-policy=\"autounseal\"", "-wrap-ttl=120", "-format", "json")
+		"token", "create", "-policy=\"autounseal\"", "-format", "json")
 	if err = wrapCommandError(err); err != nil {
 		return nil, err
 	}
-	token := &token{}
+	token := &tokenInfo{}
 	err = json.Unmarshal(jsonData, token)
 	if err != nil {
 		return nil, err
@@ -186,6 +216,16 @@ func CreateToken(fullFileName string) (*token, error) {
 		return nil, err
 	}
 	return token, err
+}
+
+func UnWrap() (string, error) {
+	jsonData, err := common.Execute("vault",
+		nil,
+		"unwrap", "-format", "json")
+	if err = wrapCommandError(err); err != nil {
+		return "", err
+	}
+	return string(jsonData), nil
 }
 
 func Unseal(initialization *Initialization, fullFileName string) (*status, error) {
@@ -239,63 +279,4 @@ func doOneUnseal(value string) (*seal, error) {
 	err = json.Unmarshal(jsonData, seal)
 
 	return seal, err
-}
-
-func wrapCommandError(err error) error {
-	if err == nil {
-		return nil
-	}
-	var commandError *common.CommandError
-	if errors.As(err, &commandError) {
-		return newVaultError(commandError)
-	}
-	return err
-}
-
-type vaultError struct {
-	err              common.CommandError
-	vaultDescription string
-}
-
-func (v vaultError) Error() string {
-	return fmt.Sprintf("Vault ERROR:\n%s", v.err.Error)
-}
-
-func newVaultError(err *common.CommandError) error {
-	if err == nil {
-		// As a convenience, if err is nil, newCommandError returns nil.
-		return nil
-	}
-	vaultDescription := ""
-	if err.ExitCode == 1 {
-		vaultDescription = "\n\texitCode was 1, VAULT description: Local errors such as incorrect flags, failed validations, or wrong numbers of arguments"
-	} else if err.ExitCode == 2 {
-		vaultDescription = "\n\texitCode was 2, VAULT description: Any remote errors such as API failures, bad TLS, or incorrect API parameters"
-	} else if err.ExitCode != 0 {
-		vaultDescription = fmt.Sprintf("\n\tExitCode was %v", err.ExitCode)
-	}
-	return &vaultError{*err, vaultDescription}
-}
-
-func ExitIfError(err error) {
-	if err == nil {
-		return
-	}
-	var commandError *common.CommandError
-	if errors.As(err, &commandError) {
-		_, _ = os.Stdout.Write([]byte(err.Error()))
-		os.Exit(commandError.ExitCode)
-	}
-	_, _ = os.Stdout.Write([]byte(err.Error()))
-	os.Exit(-1)
-}
-
-func FullFileName(fileName string) string {
-	const root4vault = "ROOT4VAULT"
-	rootPath := os.Getenv(root4vault)
-	if len(rootPath) < 1 {
-		_, _ = os.Stdout.WriteString(root4vault + " environment variable is not defined, set './' as default\n")
-		rootPath = "./"
-	}
-	return filepath.Join(rootPath, fileName)
 }
