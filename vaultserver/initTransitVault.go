@@ -6,10 +6,10 @@ import (
 	"vaultserver/command"
 )
 
-const vaultAddressTransit = "http://localhost:8200"
+const defaultVaultAddressTransit = "http://localhost:8200"
 
 func main() {
-	command.Setup(vaultAddressTransit)
+	command.Setup(defaultVaultAddressTransit)
 
 	var status, err = command.GetStatus()
 	command.ExitIfError(err)

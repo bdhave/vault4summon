@@ -4,10 +4,10 @@ import (
 	"vaultserver/command"
 )
 
-const vaultAddress = "http://localhost:8100"
+const defaultVaultAddress = "http://localhost:8100"
 
 func main() {
-	command.SetupWithToken(vaultAddress)
+	command.SetupWithToken(defaultVaultAddress)
 
 	_, err := command.UnWrap()
 	command.ExitIfError(err)

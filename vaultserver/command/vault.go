@@ -14,6 +14,9 @@ const InitializationFilename = "config/initialization.json"
 const auditFilename = "audit/audit.log"
 const TokenFileName = "token.json"
 
+const vaultAddr = "VAULT_ADDR"
+const vaultToken = "VAULT_TOKEN"
+
 type status struct {
 	Type         string `json:"type"`
 	Initialized  bool   `json:"initialized"`
@@ -43,6 +46,12 @@ type seal struct {
 	HaEnabled    bool   `json:"ha_enabled"`
 }
 
+type tokenInfo struct {
+	Duration  int          `json:"lease_duration"`
+	Renewable bool         `json:"renewable"`
+	Token     tokenWrapped `json:"wrap_info"`
+}
+
 type tokenWrapped struct {
 	Token           string `json:"token"`
 	Accessor        string `json:"accessor"`
@@ -50,18 +59,11 @@ type tokenWrapped struct {
 	TTL             int    `json:"ttl"`
 }
 
-type tokenInfo struct {
-	Duration  int          `json:"lease_duration"`
-	Renewable bool         `json:"renewable"`
-	Token     tokenWrapped `json:"wrap_info"`
-}
-
 func SetupWithToken(address string) {
-	const vaultToken = "VAULT_TOKEN"
 	Setup(address)
 
 	if len(os.Args) > 2 {
-		ExitIfError(errors.New("this application accepts ONE and ONLY ONE argument"))
+		ExitIfError(errors.New("this application accepts ONE and ONLY ONE argument, the token"))
 	}
 	if len(os.Getenv(vaultToken)) == 0 && len(os.Args) != 2 {
 		ExitIfError(fmt.Errorf(
@@ -80,7 +82,6 @@ func SetupWithToken(address string) {
 }
 
 func Setup(address string) {
-	const vaultAddr = "VAULT_ADDR"
 	if len(os.Getenv(vaultAddr)) == 0 {
 
 		_, _ = fmt.Fprintf(os.Stderr, "%s environment variable is not defined, set '%s' as default\n", vaultAddr, address)
@@ -142,7 +143,7 @@ func initialize(fullFileName string) (*status, *Initialization, error) {
 		return nil, nil, err
 	}
 
-	err = os.Setenv("VAULT_TOKEN", initialization.RootToken)
+	err = os.Setenv(vaultToken, initialization.RootToken)
 	if err != nil {
 		return nil, nil, err
 	}
