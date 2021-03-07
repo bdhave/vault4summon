@@ -7,7 +7,7 @@ Execute the following command to unwrap the secrets passed from Vault 1.
 
 $ VAULT_TOKEN=<wrapping_token> vault unwrap
 
-$ VAULT_TOKEN="s.AFqDxN5jdiDQDNuodJxsC6dm" vault unwrap
+$ VAULT_TOKEN="s.XQiNmZvfbe3H7REwIF088wYZ" vault unwrap
 
 Key                  Value
 ---                  -----
@@ -25,7 +25,7 @@ Set VAULT_TOKEN environment variable whose value is the client token you just un
 
 Example:
 
-$ export VAULT_TOKEN="s.SJj086AW7ZaobvRmNoSjhVaj"
+$ export VAULT_TOKEN="s.XQiNmZvfbe3H7REwIF088wYZ"
 Copy
 Create a server configuration file (config-autounseal.hcl) to start a second Vault instance (Vault 2).
 

@@ -12,44 +12,48 @@ import (
 
 const InitializationFilename = "config/initialization.json"
 const auditFilename = "audit/audit.log"
-const TokenFileName = "token.json"
 
 const vaultAddr = "VAULT_ADDR"
 const vaultToken = "VAULT_TOKEN"
 
 type status struct {
-	Type         string `json:"type"`
-	Initialized  bool   `json:"initialized"`
-	Sealed       bool   `json:"sealed"`
-	Version      string `json:"version"`
-	Nonce        string `json:"nonce"`
-	RecoverySeal bool   `json:"recovery_seal"`
-	StorageType  string `json:"storage_type"`
-	HaEnabled    bool   `json:"ha_enabled"`
+	Type         string   `json:"type"`
+	Initialized  bool     `json:"initialized"`
+	Sealed       bool     `json:"sealed"`
+	Version      string   `json:"version"`
+	Nonce        string   `json:"nonce"`
+	RecoverySeal bool     `json:"recovery_seal"`
+	StorageType  string   `json:"storage_type"`
+	HaEnabled    bool     `json:"ha_enabled"`
+	Warnings     []string `json:"warnings"`
 }
 
 type Initialization struct {
 	Seals        []string `json:"unseal_keys_b64"`
 	RecoveryKeys []string `json:"recovery_keys_b64"`
 	RootToken    string   `json:"root_token"`
+	Warnings     []string `json:"warnings"`
 }
 
 type seal struct {
-	Progress     int    `json:"progress"`
-	Type         string `json:"type"`
-	Initialized  bool   `json:"initialized"`
-	Sealed       bool   `json:"sealed"`
-	Version      string `json:"version"`
-	Nonce        string `json:"nonce"`
-	RecoverySeal bool   `json:"recovery_seal"`
-	StorageType  string `json:"storage_type"`
-	HaEnabled    bool   `json:"ha_enabled"`
+	Progress     int      `json:"progress"`
+	Type         string   `json:"type"`
+	Initialized  bool     `json:"initialized"`
+	Sealed       bool     `json:"sealed"`
+	Version      string   `json:"version"`
+	Nonce        string   `json:"nonce"`
+	RecoverySeal bool     `json:"recovery_seal"`
+	StorageType  string   `json:"storage_type"`
+	HaEnabled    bool     `json:"ha_enabled"`
+	Warnings     []string `json:"warnings"`
 }
 
 type tokenInfo struct {
 	Duration  int          `json:"lease_duration"`
 	Renewable bool         `json:"renewable"`
 	Token     tokenWrapped `json:"wrap_info"`
+	Auth      auth         `json:"auth"`
+	Warnings  []string     `json:"warnings"`
 }
 
 type tokenWrapped struct {
@@ -57,6 +61,13 @@ type tokenWrapped struct {
 	Accessor        string `json:"accessor"`
 	WrappedAccessor string `json:"wrapped_accessor"`
 	TTL             int    `json:"ttl"`
+}
+
+type auth struct {
+	Token         string   `json:"client_token"`
+	Accessor      string   `json:"accessor"`
+	Policies      []string `json:"policies"`
+	TokenPolicies []string `json:"token_policies"`
 }
 
 func SetupWithToken(address string) {
@@ -104,7 +115,7 @@ func GetStatus() (*status, error) {
 }
 
 func InitializeTransit(fullFileName string) (*status, *Initialization, error) {
-	status, initialization, err := initialize(fullFileName)
+	status, initialization, err := initialize(fullFileName, false)
 	if err != nil {
 		return status, initialization, err
 	}
@@ -122,18 +133,27 @@ func InitializeTransit(fullFileName string) (*status, *Initialization, error) {
 	return status, initialization, err
 }
 
-func InitializeVault(fullFileName string) (*status, *Initialization, error) {
-	status, initialization, err := initialize(fullFileName)
+func InitializeVault(fullFileName string, recoveryKey bool) (*status, *Initialization, error) {
+	status, initialization, err := initialize(fullFileName, recoveryKey)
 	if err != nil {
 		return status, initialization, err
 	}
 	return status, initialization, nil
 }
 
-func initialize(fullFileName string) (*status, *Initialization, error) {
-	var jsonData, err = common.Execute("vault",
-		nil,
-		"operator", "init", "-format", "json")
+func initialize(fullFileName string, recoveryKey bool) (*status, *Initialization, error) {
+	var jsonData []byte
+	var err error
+
+	if recoveryKey {
+		jsonData, err = common.Execute("vault",
+			nil,
+			"operator", "init", "-recovery-shares=1", "-recovery-threshold=1", "-format", "json")
+	} else {
+		jsonData, err = common.Execute("vault",
+			nil,
+			"operator", "init", "-format", "json")
+	}
 	if err = wrapCommandError(err); err != nil {
 		return nil, nil, err
 	}
@@ -143,12 +163,12 @@ func initialize(fullFileName string) (*status, *Initialization, error) {
 		return nil, nil, err
 	}
 
-	err = os.Setenv(vaultToken, initialization.RootToken)
+	err = ioutil.WriteFile(fullFileName, jsonData, 0644)
 	if err != nil {
-		return nil, nil, err
+		return nil, initialization, err
 	}
 
-	err = ioutil.WriteFile(fullFileName, jsonData, 0644)
+	err = setToken(initialization)
 	if err != nil {
 		return nil, initialization, err
 	}
@@ -157,6 +177,11 @@ func initialize(fullFileName string) (*status, *Initialization, error) {
 		return nil, initialization, err
 	}
 	return status, initialization, err
+}
+
+func setToken(initialization *Initialization) error {
+	token := initialization.RootToken
+	return os.Setenv(vaultToken, token)
 }
 
 func EnableAudit(fullFileName string) error {
@@ -193,22 +218,24 @@ func enableTransit() error {
 	return nil
 }
 
-func CreateToken(fullFileName string) (string, *tokenInfo, error) {
+func CreateToken(fullFileName string) (string, error) {
 	token, err := createToken(fullFileName)
+	if token != nil && len(token.Warnings) > 0 {
+		fmt.Printf("WARNINGS: %v", token.Warnings)
+	}
 	ExitIfError(err)
-	return token.Token.Token, token, nil
+	result := token.Token.Token
+	if len(result) == 0 {
+		result = token.Auth.Token
+	}
+	return result, nil
 }
 
 func createToken(fullFileName string) (*tokenInfo, error) {
 	jsonData, err := common.Execute("vault",
 		nil,
-		"token", "create", "-policy=\"autounseal\"", "-format", "json")
+		"token", "create", "-policy=transit-policy", "-ttl", "768h", "-format", "json")
 	if err = wrapCommandError(err); err != nil {
-		return nil, err
-	}
-	token := &tokenInfo{}
-	err = json.Unmarshal(jsonData, token)
-	if err != nil {
 		return nil, err
 	}
 
@@ -216,7 +243,12 @@ func createToken(fullFileName string) (*tokenInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	return token, err
+	tokenInfo := &tokenInfo{}
+	err = json.Unmarshal(jsonData, tokenInfo)
+	if err != nil {
+		return nil, err
+	}
+	return tokenInfo, err
 }
 
 func UnWrap() (string, error) {
@@ -235,15 +267,9 @@ func Unseal(initialization *Initialization, fullFileName string) (*status, error
 		return status, err
 	}
 
-	if initialization == nil {
-		dat, err := ioutil.ReadFile(fullFileName)
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(dat, initialization)
-		if err != nil {
-			return nil, err
-		}
+	initialization, err = ReadInitialization(initialization, fullFileName)
+	if err != nil {
+		return status, err
 	}
 
 	if initialization != nil {
@@ -266,6 +292,22 @@ func Unseal(initialization *Initialization, fullFileName string) (*status, error
 		ExitIfError(fmt.Errorf("cannot unseal vault"))
 	}
 	return status, nil
+}
+
+func ReadInitialization(initialization *Initialization, fullFileName string) (*Initialization, error) {
+	if initialization == nil {
+		dat, err := ioutil.ReadFile(fullFileName)
+		if err != nil {
+			return nil, err
+		}
+		initialization = &Initialization{}
+		err = json.Unmarshal(dat, initialization)
+		if err != nil {
+			return nil, err
+		}
+	}
+	err := setToken(initialization)
+	return initialization, err
 }
 
 func doOneUnseal(value string) (*seal, error) {

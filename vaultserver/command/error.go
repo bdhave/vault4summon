@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"vaultserver/common"
 )
 
@@ -25,7 +24,7 @@ type vaultError struct {
 }
 
 func (v vaultError) Error() string {
-	return fmt.Sprintf("Vault ERROR:\n%s", v.err.Error)
+	return fmt.Sprintf("Vault ERROR:\n%v", v.err.Error)
 }
 
 func newVaultError(err *common.CommandError) error {
@@ -55,14 +54,4 @@ func ExitIfError(err error) {
 	}
 	_, _ = os.Stdout.Write([]byte(err.Error()))
 	os.Exit(-1)
-}
-
-func FullFileName(fileName string) string {
-	const root4vault = "ROOT4VAULT"
-	rootPath := os.Getenv(root4vault)
-	if len(rootPath) < 1 {
-		_, _ = os.Stdout.WriteString(root4vault + " environment variable is not defined, set './' as default\n")
-		rootPath = "./"
-	}
-	return filepath.Join(rootPath, fileName)
 }
