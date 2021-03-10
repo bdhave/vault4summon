@@ -41,6 +41,7 @@ services:
     environment:
       - VAULT_ADDR=http://localhost:8100
       - ROOT4VAULT=/vault
+      - VAULT_TOKEN=s.eJnlgk7lczZDCVwtcO2tOf3U
 
     container_name: vault
 

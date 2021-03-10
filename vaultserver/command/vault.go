@@ -94,7 +94,6 @@ func SetupWithToken(address string) {
 
 func Setup(address string) {
 	if len(os.Getenv(vaultAddr)) == 0 {
-
 		_, _ = fmt.Fprintf(os.Stderr, "%s environment variable is not defined, set '%s' as default\n", vaultAddr, address)
 		_ = os.Setenv(vaultAddr, address)
 	}

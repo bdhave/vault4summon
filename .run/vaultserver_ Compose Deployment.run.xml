@@ -2,6 +2,14 @@
   <configuration default="false" name="vaultserver: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" server-name="local">
     <deployment type="docker-compose.yml">
       <settings>
+        <option name="envVars">
+          <list>
+            <DockerEnvVarImpl>
+              <option name="name" value="VAULT_TOKEN" />
+              <option name="value" value="s.6zazh2uRBHNys1rEJgPuWUOV" />
+            </DockerEnvVarImpl>
+          </list>
+        </option>
         <option name="sourceFilePath" value="vaultserver/docker-compose.yml" />
       </settings>
     </deployment>

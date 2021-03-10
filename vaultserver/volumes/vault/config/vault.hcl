@@ -12,7 +12,7 @@ listener "tcp" {
   tls_disable = "true"
 }
 
-api_addr = "http://vault:8100"
+api_addr = "http://localhost:8100"
 
 seal "transit" {
   address = "http://vault:8200"

@@ -60,7 +60,7 @@ func (e *CommandError) Error() string {
 	if len(e.stderr) > 0 {
 		stderr = "\nstderr:\n" + string(e.stderr)
 	}
-	return fmt.Sprintf("%s:\n%s%s%v", description, stdout, stderr, e.err)
+	return fmt.Sprintf("%s:\nstdout\n%s\nstdout\n%s\n%v", description, stdout, stderr, e.err)
 }
 
 func newCommandError(err *exec.ExitError, console []byte, stderr []byte, command string, args []string) error {

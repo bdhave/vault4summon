@@ -24,7 +24,7 @@ type vaultError struct {
 }
 
 func (v vaultError) Error() string {
-	return fmt.Sprintf("Vault ERROR:\n%v", v.err.Error)
+	return fmt.Sprintf("Vault ERROR:\n%v", v.err.Error())
 }
 
 func newVaultError(err *common.CommandError) error {
