@@ -15,7 +15,7 @@ until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084)
 * Build or download vault4summon
   * `go build`
 * Install
-  * Copy `vault4sumomon` to `/usr/local/lib/summon/`
+  * Copy `vault4summon` to `/usr/local/lib/summon/`
 * Configure 
   * Set the [environment variables](https://www.vaultproject.io/docs/commands#environment-variables)
     to access Hashicorp Vault
@@ -73,4 +73,4 @@ When submitting code, please make efforts to follow existing conventions and sty
 as possible. Please also make sure your code compiles and passes tests.
 
 Before your code can be accepted into the project, you must also sign the Individual Contributor License Agreement. I
-use [cla-assistant.io](https://cla-assistant.io) and you will be prompted to sign once a pull request is opened.
+use [cla-assistant.io](https://cla-assistant.io). You will be prompted to sign once a pull request is opened.
