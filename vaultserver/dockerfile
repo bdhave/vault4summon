@@ -1,4 +1,4 @@
-FROM vault as vaultupdated
+﻿FROM vault as vaultupdated
 RUN apk --no-cache -U upgrade
 
 FROM vaultupdated

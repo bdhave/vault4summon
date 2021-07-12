@@ -5,7 +5,7 @@ target/
 privatenotes/
 vaultserver/
 .gitignore
-LICENSE
 startVaultDEVContainer.sh
 startSummonContainer.sh
 readme.md
+dockerfile
