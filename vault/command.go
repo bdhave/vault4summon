@@ -8,7 +8,7 @@ import (
 )
 
 func Version() string {
-	return "0.2"
+	return "0.3"
 }
 
 func RetrieveSecret(argument string) (string, error) {
