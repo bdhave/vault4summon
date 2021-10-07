@@ -5,52 +5,24 @@ on:
     types: [published]
 
 jobs:
-  release:
+  releases-matrix:
     name: Release
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        kind: ['linux', 'windows', 'macOS']
-        include:
-          - kind: linux
-            os: ubuntu-latest
-            target: linux-x64
-          - kind: windows
-            os: windows-latest
-            target: win-x64
-          - kind: macOS
-            os: macos-latest
-            target: osx-x64
-    runs-on: ${{ matrix.os }}
+        goos: [linux, windows, darwin]
+        goarch: ["386", amd64]
+        exclude:
+          - goarch: "386"
+            goos: darwin
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.16
-
-      - name: Build
-        shell: bash
-        run: |
-          tag=$(git describe --tags --abbrev=0)
-          release_name="vault4summon-$tag-${{ matrix.target }}"
-          mkdir "$release_name"
-          go build -o "$release_name/vault4summon"
-          # Pack files
-          if [ "${{ matrix.target }}" == "win-x64" ]; then
-            # Pack to zip for Windows
-            7z a -tzip "${release_name}.zip" "./${release_name}/*"
-          else
-          tar czvf "${release_name}.tar.gz" "$release_name"
-          fi
-          # Delete output directory
-          rm -r "$release_name"
-
-
-      - name: Publish
-        uses: softprops/action-gh-release@v1
-        with:
-          files: "vault4summon-*"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@v2
+    - uses: wangyoucao577/go-release-action@v1.20
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goos: ${{ matrix.goos }}
+        goarch: ${{ matrix.goarch }}
+        goversion: 1.17
+        binary_name: "vault4summon"
+        sha256sum: TRUE
+        md5sum: TRUE
