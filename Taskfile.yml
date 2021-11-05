@@ -1,0 +1,37 @@
+# https://taskfile.dev
+version: 3
+output: prefixed
+
+env:
+  MAIN_VAULT_PORT: 8100
+  MAIN_VAULT_ADDR: http://localhost:"{{.VAULT_PORT}}"
+  TRANSIT_VAULT_PORT: 8200
+  TRANSIT_VAULT_ADDR: http://localhost:"{{.TRANSIT_VAULT_PORT}}"
+  #TRANSIT_VAULT_VOLUME_ROOT: ./volumes/transit
+
+tasks:
+  compose-build:
+    cmds:
+      - docker compose -f ./vaultserver/docker-compose.yml build
+    silent: false
+
+  compose-run-transit:
+    cmds:
+      - docker compose -f ./vaultserver/docker-compose.yml run transitvault
+    silent: false
+
+  compose-run-vault:
+    cmds:
+      - docker compose -f ./vaultserver/docker-compose.yml run vault
+
+  compose-run:
+    cmds:
+      - docker compose -f ./vaultserver/docker-compose.yml run transitvault vault
+    silent: false
+
+  default:
+    cmds:
+      - echo MAIN_VAULT_ADDR "{{.VAULT_ADDR}}"
+      - echo TRANSIT_VAULT_ADDR "{{.TRANSIT_VAULT_ADDR}}"
+    silent: false
+
