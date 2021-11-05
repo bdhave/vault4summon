@@ -1,1 +1,10 @@
 volumes/
+#docker-compose.yml
+.dockerignore
+#dockerfile
+certificates/
+command/
+common/
+go.mod
+*.go
+readme.md

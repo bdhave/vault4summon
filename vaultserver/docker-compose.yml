@@ -1,4 +1,3 @@
-version: '3.8'
 services:
 
   vaulttransit:
@@ -8,16 +7,16 @@ services:
       dockerfile: dockerfile
 
     environment:
-      - VAULT_ADDR=http://localhost:8200
+      - VAULT_ADDR=${TRANSIT_VAULT_ADDR:?err}
       - ROOT4VAULT=/vault
 
-    container_name: vaulttransit
+    container_name: vault-transit
 
     networks:
       - vault
 
     ports:
-      - "8200:8200"
+      - "${TRANSIT_VAULT_PORT:?err}:${TRANSIT_VAULT_PORT:?err}"
 
     restart: always
 
@@ -30,16 +29,18 @@ services:
     cap_add:
       - IPC_LOCK
 
-    entrypoint: vault server -config=/vault/config/vault.hcl
+    entrypoint: vault server -config=/vault/config/transit-vault.hcl
 
   vault:
+    depends_on:
+      - vault-transit
 
     build:
       context: ""
       dockerfile: dockerfile
 
     environment:
-      - VAULT_ADDR=http://localhost:8100
+      - VAULT_ADDR=${MAIN_VAULT_ADDR:?err}
       - ROOT4VAULT=/vault
       - VAULT_TOKEN=s.eJnlgk7lczZDCVwtcO2tOf3U
 
@@ -49,7 +50,7 @@ services:
       - vault
 
     ports:
-      - "8100:8100"
+      - "${MAIN_VAULT_PORT:?err}:${MAIN_VAULT_PORT:?err}"
 
     restart: always
 
