@@ -4,12 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/vault/api"
 	"strings"
-	"vault4summon/common"
 )
-
-func Version() string {
-	return "0.4"
-}
 
 func RetrieveSecret(argument string) (string, error) {
 	var err error
@@ -21,8 +16,8 @@ func RetrieveSecret(argument string) (string, error) {
 
 	// use KvV2 as a first try
 	var isVaultEngineV2 = true
-	var variableId *common.VariableID
-	variableId, err = common.NewVariableID(argument)
+	var variableId *VariableID
+	variableId, err = NewVariableID(argument)
 	if err != nil {
 		return "", err
 	}
@@ -50,7 +45,7 @@ func isMetadataPresent(secret *api.Secret) bool {
 	return secret.Data["metadata"] != nil
 }
 
-func getSecrets(variableID *common.VariableID, client *api.Client, isVaultEngineV2 bool) (*api.Secret, error) {
+func getSecrets(variableID *VariableID, client *api.Client, isVaultEngineV2 bool) (*api.Secret, error) {
 	var path = normalizePath(variableID.Path, isVaultEngineV2)
 	secret, err := client.Logical().Read(path)
 

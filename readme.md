@@ -19,8 +19,8 @@ until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084)
 * Configure 
   * Set the [environment variables](https://www.vaultproject.io/docs/commands#environment-variables)
     to access Hashicorp Vault
-    * `VAULT_ADDR`: e.g. https://127.0.0.1:8200/.
-    * `VAULT_TOKEN`: e.g. 1234
+    * `VAULT_ADDR`: e.g. http://127.0.0.1:8200/.
+    * `VAULT_TOKEN`: e.g. 00000000-0000-0000-0000-000000000000
 * Use Summon
 
 ## Summon provider contract
@@ -47,7 +47,7 @@ The Vault CLI to retrieve a secret is
 
 `vault kv get -field=mysecretkeypath secret/name`
 
-This provider are 2 implemented formats for Variable ID:
+This provider has 2 implemented formats for Variable ID:
 
 * secret/name#mysecretkeypath as used 
   by [AWS Secrets Manager provider](https://github.com/cyberark/summon-aws-secrets)
