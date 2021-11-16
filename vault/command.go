@@ -69,7 +69,7 @@ func newSecretID(argument string) (*secretID, error) {
 	return id, nil
 }
 
-func RetrieveSecret(argument string) (string, error) {
+func GetSecret(argument string) (string, error) {
 	var err error
 	var client *api.Client
 	client, err = api.NewClient(nil)

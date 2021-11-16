@@ -21,7 +21,7 @@ func main() {
 	case "-v", "--version":
 		result = version()
 	default:
-		result, err = vault.RetrieveSecret(argument)
+		result, err = vault.GetSecret(argument)
 	}
 	exitIfError(err)
 	printSecret(result)
