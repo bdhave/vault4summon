@@ -3,9 +3,9 @@ version: 3
 output: prefixed
 
 env:
-  VAULT_DEV_PORT: 8100
-  VAULT_DEV_ADDR: http://localhost:"{{.VAULT_DEV_PORT}}"
-  VAULT_DEV_ROOT_TOKEN_ID: 00000000-0000-0000-0000-000000000000
+  DEV_PORT: 8100
+  DEV_ADDR: http://localhost:"{{.DEV_PORT}}"
+  DEV_ROOT_TOKEN_ID: 00000000-0000-0000-0000-000000000000
   MAIN_VAULT_PORT: 8100
   MAIN_VAULT_ADDR: http://localhost:"{{.VAULT_PORT}}"
   TRANSIT_VAULT_PORT: 8200
@@ -15,8 +15,10 @@ env:
 tasks:
   start-vaultDEV:
     cmds:
-      - docker run --cap-add=IPC_LOCK -e 'VAULT_DEV_ROOT_TOKEN_ID=00000000-0000-0000-0000-000000000000' -p 127.0.0.1:8100:8100/tcp --name vault vaultDEV
+      - echo starting VaultDEV on {{.DEV_ADDR}} with root token= {{.DEV_ROOT_TOKEN_ID}}
+      - docker run --cap-add=IPC_LOCK -e 'VAULT_DEV_ROOT_TOKEN_ID={{.DEV_ROOT_TOKEN_ID}}' -p {{.DEV_ADDR}}:{{.DEV_PORT}}/tcp --name vault vaultDEV
     silent: false
+
   compose-build:
     cmds:
       - docker compose -f ./vaultserver/docker-compose.yml build
