@@ -5,7 +5,7 @@ target/
 privatenotes/
 vaultserver/
 .gitignore
-startVaultDEVContainer.sh
 startSummonContainer.sh
 readme.md
 dockerfile
+Taskfile.yml
