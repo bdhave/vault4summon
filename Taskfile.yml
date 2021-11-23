@@ -3,39 +3,61 @@ version: 3
 output: prefixed
 
 env:
-  DEV_PORT: 8100
-  DEV_ADDR: http://localhost:"{{.DEV_PORT}}"
+  DEV_PORT: 8200
+  DEV_ADDR: https://127.0.0.1:{{.DEV_PORT}}
   DEV_ROOT_TOKEN_ID: 00000000-0000-0000-0000-000000000000
   MAIN_VAULT_PORT: 8100
-  MAIN_VAULT_ADDR: http://localhost:"{{.VAULT_PORT}}"
+  MAIN_VAULT_ADDR: http://localhost:{{.VAULT_PORT}}
   TRANSIT_VAULT_PORT: 8200
-  TRANSIT_VAULT_ADDR: http://localhost:"{{.TRANSIT_VAULT_PORT}}"
+  TRANSIT_VAULT_ADDR: http://localhost:{{.TRANSIT_VAULT_PORT}}
   #TRANSIT_VAULT_VOLUME_ROOT: ./volumes/transit
 
 tasks:
   start-vaultDEV:
     cmds:
       - echo starting VaultDEV on {{.DEV_ADDR}} with root token= {{.DEV_ROOT_TOKEN_ID}}
-      - docker run --cap-add=IPC_LOCK -e 'VAULT_DEV_ROOT_TOKEN_ID={{.DEV_ROOT_TOKEN_ID}}' -p {{.DEV_ADDR}}:{{.DEV_PORT}}/tcp --name vault vaultDEV
+      - export VAULT_DEV_ROOT_TOKEN_ID=={{.DEV_ROOT_TOKEN_ID}}
+      - export VAULT_DEV_LISTEN_ADDRESS={{.DEV_ADDR}}
+      - echo Vault %VAULT_ADDR, token %VAULT_TOKEN
+      - docker run --cap-add=IPC_LOCK
+        -e 'VAULT_DEV_ROOT_TOKEN_ID={{.DEV_ROOT_TOKEN_ID}}'
+        -e 'VAULT_ADDR={{.DEV_ADDR}}'
+        -p {{.DEV_PORT}}:{{.DEV_PORT}}/tcp --name vaultDEV vault
+    silent: false
+
+  demo:
+    cmds:
+      - export VAULT_DEV_ROOT_TOKEN_ID=={{.DEV_ROOT_TOKEN_ID}}
+      - export VAULT_TOKEN=={{.DEV_ROOT_TOKEN_ID}}
+      - export VAULT_DEV_LISTEN_ADDRESS={{.DEV_ADDR}}
+      - echo add secrets for secret/DIGIT/ULYSSE
+      - vault kv put secret/DIGIT/ULYSSE/dev passcode=my-long-passcode-dev
+      - vault kv put secret/DIGIT/ULYSSE/test passcode=my-long-passcode-test
+      - vault kv put secret/DIGIT/ULYSSE/acc passcode=my-long-passcode-acc
+      - vault kv put secret/DIGIT/ULYSSE/prod passcode=my-long-passcode-prod
     silent: false
 
   compose-build:
+    dir: vaultserver
     cmds:
-      - docker compose -f ./vaultserver/docker-compose.yml build
+      - docker compose -f docker-compose.yml build
     silent: false
 
   compose-run-transit:
+    dir: vaultserver
     cmds:
-      - docker compose -f ./vaultserver/docker-compose.yml run transitvault
+      - docker compose -f docker-compose.yml run transitvault
     silent: false
 
   compose-run-vault:
+    dir: vaultserver
     cmds:
-      - docker compose -f ./vaultserver/docker-compose.yml run vault
+      - docker compose -f docker-compose.yml run vault
 
   compose-run:
+    dir: vaultserver
     cmds:
-      - docker compose -f ./vaultserver/docker-compose.yml run transitvault vault
+      - docker compose -f docker-compose.yml run transitvault vault
     silent: false
 
   default:
