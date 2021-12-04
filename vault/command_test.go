@@ -1,20 +1,20 @@
-package common
+package vault
 
 import (
 	"reflect"
 	"testing"
 )
 
-func TestNewVariableID(t *testing.T) {
+func TestNewSecretID(t *testing.T) {
 	type test struct {
 		name          string
 		argument      string
-		variableId    *VariableID
+		id            *secretID
 		expectedValid bool
 	}
 
 	var tests = []test{
-		{"AWS format", "secret/hello#foo", &VariableID{
+		{"AWS format", "secret/hello#foo", &secretID{
 			Path: "secret/hello",
 			Key:  "foo",
 		}, true},
@@ -25,7 +25,7 @@ func TestNewVariableID(t *testing.T) {
 		{"invalid AWS format ending with slash after #", "secret/hello#foo/error", nil, false},
 		{"invalid AWS format with double slash#", "secret//hello#foo", nil, false},
 
-		{"Keepass format", "secret/hello/foo", &VariableID{
+		{"Keepass format", "secret/hello/foo", &secretID{
 			Path: "secret/hello",
 			Key:  "foo",
 		}, true},
@@ -38,15 +38,15 @@ func TestNewVariableID(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewVariableID(tt.argument)
+			got, err := newSecretID(tt.argument)
 			if tt.expectedValid && err != nil {
 				t.Errorf("Unexpected error for %v: %v", tt.argument, err)
 			} else if !tt.expectedValid && err == nil {
 				t.Errorf("Error expected for %v", tt.argument)
 			}
 
-			if !reflect.DeepEqual(got, tt.variableId) {
-				t.Errorf("NewVariableID() = %v, variableId %v", got, tt.variableId)
+			if !reflect.DeepEqual(got, tt.id) {
+				t.Errorf("newSecretID() = %v, secretId %v", got, tt.id)
 			}
 		})
 	}
