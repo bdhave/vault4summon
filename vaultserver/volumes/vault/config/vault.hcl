@@ -15,7 +15,8 @@ listener "tcp" {
 api_addr = "http://localhost:8100"
 
 seal "transit" {
-  address = "http://vault:8200"
+#  address = "http://vault:8200"
+  address = "http://localhost:8200"
   disable_renewal = "true"
   key_name = "autounseal"
   mount_path = "transit/"

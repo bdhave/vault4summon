@@ -28,7 +28,6 @@ func main() {
 
 	token, err := command.CreateToken(command.FullFileName(tokenFileName))
 	command.ExitIfError(err)
-	//fmt.Printf("tokenInfo: %v", tokenInfo)
 	_, _ = fmt.Printf("%s", token)
 
 	command.ExitIfError(err)

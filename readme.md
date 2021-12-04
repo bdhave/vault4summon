@@ -1,12 +1,11 @@
 # vault4summon: this project implement a [CyberArk Summon](https://cyberark.github.io/summon/) provider using [Hashicorp Vault](https://www.vaultproject.io/) as secrets provider
-
-`This project is distributed under the terms of the European Union Public Licence (EUPL) Version 1.2 or newer.`
-
+>This project is distributed under the terms of the European Union Public Licence (EUPL) Version 1.2 or newer.`
 You can find the latest version of the EUPL
 licence [here](https://ec.europa.eu/isa2/solutions/european-union-public-licence-eupl_en).
 
-**WARNING: the current code was only tested with a Hashicorp Vault Server in development mode.**
+> The work on this software project is in no way associated with my employer nor with the role I'm having at my employer. Any requests for changes will be decided upon exclusively by myself based on my personal preferences. I maintain this project as much or as little as my spare time permits.
 
+**WARNING: the current code was only tested with a Hashicorp Vault Server in development mode.
 **It must therefore be considered as a Proof of Concept, and it is not intended to be used in production 
 until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084) is  closed**
 
@@ -15,7 +14,7 @@ until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084)
 * Build or download vault4summon
   * `go build`
 * Install
-  * Copy `vault4sumomon` to `/usr/local/lib/summon/`
+  * Copy `vault4summon` to `/usr/local/lib/summon/`
 * Configure 
   * Set the [environment variables](https://www.vaultproject.io/docs/commands#environment-variables)
     to access Hashicorp Vault
@@ -73,4 +72,4 @@ When submitting code, please make efforts to follow existing conventions and sty
 as possible. Please also make sure your code compiles and passes tests.
 
 Before your code can be accepted into the project, you must also sign the Individual Contributor License Agreement. I
-use [cla-assistant.io](https://cla-assistant.io) and you will be prompted to sign once a pull request is opened.
+use [cla-assistant.io](https://cla-assistant.io). You will be prompted to sign once a pull request is opened.

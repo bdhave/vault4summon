@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name=" compose-run" type="TaskRunConfiguration" factoryName="TaskRunConfiguration">
+    <option name="arguments" value="" />
+    <option name="task" value="compose-run" />
+    <option name="taskPath" value="" />
+    <option name="taskfile" value="$PROJECT_DIR$/vaultserver/Taskfile.yml" />
+    <method v="2" />
+  </configuration>
+</component>
