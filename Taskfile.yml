@@ -1,47 +1,93 @@
 # https://taskfile.dev
 version: 3
 output: prefixed
+silent: false
 
 env:
-  DEV_PORT: 8200
-  DEV_ADDR: https://127.0.0.1:{{.DEV_PORT}}
-  DEV_ROOT_TOKEN_ID: 00000000-0000-0000-0000-000000000000
-  MAIN_VAULT_PORT: 8100
-  MAIN_VAULT_ADDR: http://localhost:{{.VAULT_PORT}}
-  TRANSIT_VAULT_PORT: 8200
-  TRANSIT_VAULT_ADDR: http://localhost:{{.TRANSIT_VAULT_PORT}}
+  ADDR_DEFAULT: '[::]'
+  DEV_PORT: 8100
+  DEV_ADDR: '{{.ADDR_DEFAULT}}:{{.DEV_PORT}}'
+  DEV_OPTIONS:  '{"listener": [{"tcp":{"address": "{{.DEV_ADDR}}","tls_disable":"1"}}], "ui": true, "api_addr": "http://127.0.0.1:8101"}'
+  DEV_ROOT_TOKEN_ID: SP2021
+  VAULT_ADDR: "http://localhost:{{.DEV_PORT}}"
+
+
+    MAIN_VAULT_ADDR: http://localhost:{{.VAULT_PORT}}
+#  TRANSIT_VAULT_PORT: 8200
+#  TRANSIT_VAULT_ADDR: http://localhost:{{.TRANSIT_VAULT_PORT}}
   #TRANSIT_VAULT_VOLUME_ROOT: ./volumes/transit
 
 tasks:
-  start-vaultDEV:
+  dev:_stop:
+    desc: Stop the vaultDEV container
+    ignore_error: true
     cmds:
-      - echo starting VaultDEV on {{.DEV_ADDR}} with root token= {{.DEV_ROOT_TOKEN_ID}}
-      - export VAULT_DEV_ROOT_TOKEN_ID=={{.DEV_ROOT_TOKEN_ID}}
-      - export VAULT_DEV_LISTEN_ADDRESS={{.DEV_ADDR}}
-      - echo Vault %VAULT_ADDR, token %VAULT_TOKEN
-      - docker run --cap-add=IPC_LOCK
+      - docker stop vaultDEV
+
+  dev:_rm:
+    desc: Delete the vaultDEV container
+    ignore_error: true
+    cmds:
+      - docker rm vaultDEV
+
+  dev:start:
+    desc: Start the vaultDEV container on {{.DEV_ADDR}}.
+    summary: |
+      This task stops the vaultDEV container, deletes it and finaly starts it.
+      Runs on localhost entry point {{.DEV_ADDR}}
+
+    cmds:
+      - task: dev:_stop
+      - echo starting VaultDEV with  {{.DEV_OPTIONS}}
+      - echo DEV_OPTIONS= {{.DEV_OPTIONS}}
+      - docker run --rm --cap-add=IPC_LOCK
         -e 'VAULT_DEV_ROOT_TOKEN_ID={{.DEV_ROOT_TOKEN_ID}}'
-        -e 'VAULT_ADDR={{.DEV_ADDR}}'
+        -e 'VAULT_LOCAL_CONFIG={{.DEV_OPTIONS}}'
         -p {{.DEV_PORT}}:{{.DEV_PORT}}/tcp --name vaultDEV vault
-    silent: false
 
-  demo:
-    cmds:
-      - export VAULT_DEV_ROOT_TOKEN_ID=={{.DEV_ROOT_TOKEN_ID}}
-      - export VAULT_TOKEN=={{.DEV_ROOT_TOKEN_ID}}
-      - export VAULT_DEV_LISTEN_ADDRESS={{.DEV_ADDR}}
-      - echo add secrets for secret/DIGIT/ULYSSE
-      - vault kv put secret/DIGIT/ULYSSE/dev passcode=my-long-passcode-dev
-      - vault kv put secret/DIGIT/ULYSSE/test passcode=my-long-passcode-test
-      - vault kv put secret/DIGIT/ULYSSE/acc passcode=my-long-passcode-acc
-      - vault kv put secret/DIGIT/ULYSSE/prod passcode=my-long-passcode-prod
-    silent: false
+  dev:init:
+    env:
+      VAULT_TOKEN: "{{.DEV_ROOT_TOKEN_ID}}"
+      VAULT_ADDR: "{{.VAULT_ADDR}}"
 
-  compose-build:
-    dir: vaultserver
     cmds:
-      - docker compose -f docker-compose.yml build
-    silent: false
+      - echo add policies, secrets and tokens for secret/DIGIT/ULYSSE using $VAULT_ADDR with token $VAULT_TOKEN
+      - task: dev:init:_policies
+      - task: dev:init:_secrets
+      - task: dev:init:_tokens
+
+  dev:init:_policies:
+    env:
+      VAULT_TOKEN: "{{.DEV_ROOT_TOKEN_ID}}"
+      VAULT_ADDR: "{{.VAULT_ADDR}}"
+
+    cmds:
+      - vault policy write ULYSSE-developer vault-DEV-config/ULYSSE-developer.hcl
+      - vault policy write ULYSSE-operation vault-DEV-config/ULYSSE-operation.hcl
+      - vault policy write ULYSSE-server vault-DEV-config/ULYSSE-server.hcl
+      - vault policy write ULYSSE-server-prod vault-DEV-config/ULYSSE-server-prod.hcl
+
+  dev:init:_secrets:
+    env:
+      VAULT_TOKEN: "{{.DEV_ROOT_TOKEN_ID}}"
+      VAULT_ADDR: "{{.VAULT_ADDR}}"
+
+    cmds:
+      - vault kv put secret/DIGIT/ULYSSE/dev password=my-long-password-dev
+      - vault kv put secret/DIGIT/ULYSSE/test password=my-long-password-test
+      - vault kv put secret/DIGIT/ULYSSE/acc password=my-long-password-acc
+      - vault kv put secret/DIGIT/ULYSSE/prod password=my-long-password-prod
+
+  dev:init:_tokens:
+    env:
+      VAULT_TOKEN: "{{.DEV_ROOT_TOKEN_ID}}"
+      VAULT_ADDR: "{{.VAULT_ADDR}}"
+
+    cmds:
+      - sudo --stdin vault token create -id dev -policy=ULYSSE-developer -display-name Developers
+      - sudo --stdin vault token create -id ops policy=ULYSSE-operation -display-name Operational Team
+      - sudo --stdin vault token create -id dc -policy=ULYSSE-server -display-name DC
+      - sudo --stdin vault token create -id dcPROD -policy=ULYSSE-server-prod -display-name DC PROD
 
   compose-run-transit:
     dir: vaultserver
@@ -62,7 +108,6 @@ tasks:
 
   default:
     cmds:
-      - echo MAIN_VAULT_ADDR "{{.VAULT_ADDR}}"
-      - echo TRANSIT_VAULT_ADDR "{{.TRANSIT_VAULT_ADDR}}"
-    silent: false
+      - echo DEV_VAULT_ADDR "{{.VAULT_ADDR}}"
+      - echo DEV_ROOT_TOKEN_ID "{{.DEV_ROOT_TOKEN_ID}}"
 
