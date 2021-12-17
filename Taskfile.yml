@@ -10,7 +10,7 @@ vars:
   ADDR_DEFAULT: "[::]"
   DEV_ADDR: '{{.ADDR_DEFAULT}}:{{.DEV_PORT}}'
   DEV_PORT: 8100
-  DEV_OPTIONS:  '{"listener": [{"tcp":{"address": "{{.DEV_ADDR}}","tls_disable":"1"}}], "ui": true, "api_addr": "http://127.0.0.1:8101"}'
+  DEV_OPTIONS:  '{"listener": [{"tcp":{"address": "{{.DEV_ADDR}}","tls_disable":"1"}}], "ui": true, "api_addr": "http://127.0.0.1:{{.DEV_PORT}}"}'
   DEV_ROOT_TOKEN_ID: SP2021
 
   VAULT_PORT: 8200
@@ -66,7 +66,7 @@ tasks:
 
   docker run -it --rm \
     --env VAULT_TOKEN:={{.DEV_ROOT_TOKEN_ID}} \
-    --env VAULT_ADDR=http://vault:.DEV_PORT \
+    --env VAULT_ADDR=http://localhost:.DEV_PORT \
     --link vault \
     --name summon summon
       - task: dev:init:_policies
