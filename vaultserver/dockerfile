@@ -1,5 +1,7 @@
 ﻿FROM vault as vaultupdated
-RUN apk --no-cache -U upgrade
+RUN apk --no-cache -U upgrade && \
+    apk cache clean && \
+    setcap cap_ipc_lock= /usr/sbin/vault
 
 FROM vaultupdated
 WORKDIR .

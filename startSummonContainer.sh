@@ -1,6 +1,6 @@
 
 docker run -it --rm \
-    --env VAULT_TOKEN=00000000-0000-0000-0000-000000000000 \
+    --env VAULT_TOKEN=SP2021 \
     --env VAULT_ADDR=http://vault:8200 \
     --link vault \
     --name summon summon
