@@ -69,7 +69,10 @@ func newSecretID(argument string) (*secretID, error) {
 	return id, nil
 }
 
-func GetSecret(argument string) (string, error) {
+/*
+GetSecret calls Hashicorp Vault API to retrieve the secret associated with argument key.
+*/
+func GetSecret(key string) (string, error) {
 	var err error
 	var client *api.Client
 	client, err = api.NewClient(nil)
@@ -80,7 +83,7 @@ func GetSecret(argument string) (string, error) {
 	// use KvV2 as a first try
 	var isVaultEngineV2 = true
 	var id *secretID
-	id, err = newSecretID(argument)
+	id, err = newSecretID(key)
 	if err != nil {
 		return "", err
 	}
