@@ -2,6 +2,7 @@
   <configuration default="false" name="vaultserver.vault: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" server-name="local">
     <deployment type="docker-compose.yml">
       <settings>
+        <option name="envFilePath" value="" />
         <option name="services">
           <list>
             <option value="vault" />

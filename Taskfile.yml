@@ -8,16 +8,15 @@ vars:
   PROJECT_ROOT:
     sh: pwd
   ADDR_DEFAULT: "[::]"
-  DEV_ADDR: '{{.ADDR_DEFAULT}}:{{.DEV_PORT}}'
   DEV_PORT: 8100
-  DEV_OPTIONS:  '{"listener": [{"tcp":{"address": "{{.DEV_ADDR}}","tls_disable":"1"}}], "ui": true, "api_addr": "http://127.0.0.1:{{.DEV_PORT}}"}'
-  DEV_ROOT_TOKEN_ID: SP2021
-
-  VAULT_PORT: 8200
+  DEV_ADDR: '{{.ADDR_DEFAULT}}:{{.DEV_PORT}}'
+#  DEV_OPTIONS:  '{"listener": [{"tcp":{"address": "{{.DEV_ADDR}}","tls_disable":"1"}}], "ui": true, "api_addr": "http://127.0.0.1:{{.DEV_PORT}}"}'
+ # DEV_OPTIONS:  '{"listener": [{"tcp":{"address": "{{.DEV_ADDR}}","tls_disable":"1"}}], "ui": true, "api_addr": "http://127.0.0.1:8101"}'
+  VAULT_DEV_ROOT_TOKEN_ID: SP2021
+  VAULT_DEV_LISTEN_ADDRESS: localhost:8100
 
 env:
-  VAULT_ADDR: "http://localhost:{{.DEV_PORT}}"
-  MAIN_VAULT_ADDR: http://localhost:{{.VAULT_PORT}}
+  MAIN_VAULT_ADDR: http://localhost:8300
   MAIN_VAULT_PORT: 8300
   MAIN_VAULT_VOLUME_ROOT: ./volumes/vault
   TRANSIT_VAULT_PORT: 8200
@@ -26,56 +25,59 @@ env:
 
 tasks:
   dev:_stop:
-    desc: Stop the vaultDEV container
+    desc: Stop the vault-dev container
     ignore_error: true
     cmds:
-      - docker stop vaultDEV
+      - docker stop vault-dev
 
   dev:_rm:
-    desc: Delete the vaultDEV container
+    desc: Delete the vault-dev container
     ignore_error: true
     cmds:
-      - docker rm vaultDEV
+      - docker rm vault-dev
 
   dev:start:
-    desc: Start the vaultDEV container on {{.DEV_ADDR}}.
+    desc: Start the vault-dev container on {{.DEV_ADDR}}.
     summary: |
-      This task stops the vaultDEV container, deletes it and finaly starts it.
-      Runs on localhost entry point {{.DEV_ADDR}}
+      This task stops the vault-dev container, deletes it and finaly starts it.
+      Runs on localhost entry point {{.VAULT_DEV_LISTEN_ADDRESS}}. Token is '{{.VAULT_DEV_LISTEN_ADDRESS}}'
+    env:
+      VAULT_DEV_ROOT_TOKEN_ID: "{{.VAULT_DEV_ROOT_TOKEN_ID}}"
+      VAULT_DEV_LISTEN_ADDRESS: "{{.VAULT_DEV_LISTEN_ADDRESS}}"
+      VAULT_API_ADDR: "{{.VAULT_DEV_LISTEN_ADDRESS}}"
+      DEV_PORT: "{{.DEV_PORT}}"
+      #            -e 'VAULT_LOCAL_CONFIG={{.DEV_OPTIONS}}'
+
+    dir: vaultserver
 
     cmds:
       - task: dev:_stop
-      - echo starting VaultDEV with  {{.DEV_OPTIONS}}
-      - echo DEV_OPTIONS= {{.DEV_OPTIONS}}
-      - docker run --rm --cap-add=IPC_LOCK
-        -e 'VAULT_DEV_ROOT_TOKEN_ID={{.DEV_ROOT_TOKEN_ID}}'
-        -e 'VAULT_LOCAL_CONFIG={{.DEV_OPTIONS}}'
-        -p {{.DEV_PORT}}:{{.DEV_PORT}}/tcp --name vaultDEV vault
+      - task: dev:_rm
+      - echo starting Vault-dev on {{.VAULT_DEV_LISTEN_ADDRESS}}
+      - docker compose -f docker-compose.yml run vault-dev
 
   dev:init:
     env:
-      VAULT_TOKEN: "{{.DEV_ROOT_TOKEN_ID}}"
-      VAULT_ADDR: "{{.VAULT_ADDR}}"
+      VAULT_TOKEN: "{{.VAULT_DEV_ROOT_TOKEN_ID}}"
+      VAULT_ADDR: "http://{{.VAULT_DEV_LISTEN_ADDRESS}}"
 
     cmds:
       - echo add policies, secrets and tokens for secret/DIGIT/ULYSSE using $VAULT_ADDR with token $VAULT_TOKEN
-      - docker run --rm --cap-add=IPC_LOCK
-          -e 'VAULT_DEV_ROOT_TOKEN_ID={{.DEV_ROOT_TOKEN_ID}}'
-          -e 'VAULT_LOCAL_CONFIG={{.DEV_OPTIONS}}'
-          -p {{.DEV_PORT}}:{{.DEV_PORT}}/tcp dockerfile-VaultDEV-init vaultinit
 
-  docker run -it --rm \
-    --env VAULT_TOKEN:={{.DEV_ROOT_TOKEN_ID}} \
-    --env VAULT_ADDR=http://localhost:.DEV_PORT \
-    --link vault \
-    --name summon summon
+  dev:brol:
+    cmds:
+      - docker run -it --rm \
+        --env VAULT_TOKEN:={{.VAULT_DEV_ROOT_TOKEN_ID}} \
+        --env VAULT_ADDR=http://localhost:.DEV_PORT \
+        --link vault \
+        --name summon summon
       - task: dev:init:_policies
       - task: dev:init:_secrets
       - task: dev:init:_tokens
 
   dev:init:_policies:
     env:
-      VAULT_TOKEN: "{{.DEV_ROOT_TOKEN_ID}}"
+      VAULT_TOKEN: "{{.VAULT_DEV_ROOT_TOKEN_ID}}"
       VAULT_ADDR: "{{.VAULT_ADDR}}"
 
     cmds:
@@ -86,7 +88,7 @@ tasks:
 
   dev:init:_secrets:
     env:
-      VAULT_TOKEN: "{{.DEV_ROOT_TOKEN_ID}}"
+      VAULT_TOKEN: "{{.VAULT_DEV_ROOT_TOKEN_ID}}"
       VAULT_ADDR: "{{.VAULT_ADDR}}"
 
     cmds:
@@ -97,7 +99,7 @@ tasks:
 
   dev:init:_tokens:
     env:
-      VAULT_TOKEN: "{{.DEV_ROOT_TOKEN_ID}}"
+      VAULT_TOKEN: "{{.VAULT_DEV_ROOT_TOKEN_ID}}"
       VAULT_ADDR: "{{.VAULT_ADDR}}"
 
     cmds:
@@ -126,5 +128,24 @@ tasks:
   default:
     cmds:
       - echo DEV_VAULT_ADDR "{{.VAULT_ADDR}}"
-      - echo DEV_ROOT_TOKEN_ID "{{.DEV_ROOT_TOKEN_ID}}"
+      - echo DEV_ROOT_TOKEN_ID "{{.VAULT_DEV_ROOT_TOKEN_ID}}"
 
+
+#  VAULT_RETRIES=5
+#  echo "Vault is starting..."
+#  until vault status > /dev/null 2>&1 || [ "$VAULT_RETRIES" -eq 0 ]; do
+#echo "Waiting for vault to start...: $((VAULT_RETRIES--))"
+#  sleep 1
+#  done
+#
+#  echo "Authenticating to vault..."
+#  vault login token=vault-plaintext-root-token
+#
+#  echo "Initializing vault..."
+#  vault secrets enable -version=2 -path=my.secrets kv
+#
+#  echo "Adding entries..."
+#  vault kv put my.secrets/dev username=test_user
+#  vault kv put my.secrets/dev password=test_password
+#
+#  echo "Complete..."

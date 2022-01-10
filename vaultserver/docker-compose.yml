@@ -1,7 +1,58 @@
 services:
 
-  vaulttransit:
+  vault-dev:
+    build:
+      context: ""
+      dockerfile: dockerfile
 
+    environment:
+      - ROOT4VAULT=/vault
+      - VAULT_DEV_ROOT_TOKEN_ID=${VAULT_DEV_ROOT_TOKEN_ID?err}
+#      - VAULT_DEV_LISTEN_ADDRESS=${VAULT_DEV_LISTEN_ADDRESS?err}
+#      - VAULT_API_ADDR=${VAULT_DEV_LISTEN_ADDRESS?err}
+#      - VAULT_LOCAL_CONFIG=${DEV_OPTIONS}
+
+    container_name: vault-dev
+
+    networks:
+      - vault
+
+    ports:
+      - "${DEV_PORT:?err}:${DEV_PORT:?err}"
+
+    restart: always
+
+    volumes:
+      - ./volumes/DEV/logs:/vault/logs
+      - ./volumes/DEV/files:/vault/files
+      - ./volumes/DEV/config:/vault/config
+      - ./volumes/DEV/audit:/vault/audit
+
+    cap_add:
+      - IPC_LOCK
+
+  vault-dev-init:
+    build:
+      context: ""
+      dockerfile: dockerfile
+
+    environment:
+      - VAULT_ADDR=${TRANSIT_VAULT_ADDR:?err}
+      - ROOT4VAULT=/vault
+
+    container_name: vault-transit
+
+    user: root
+
+    networks:
+      - vault
+
+    restart: never
+
+    volumes:
+      - ./volumes/DEV/config:/vault/config
+
+  vaulttransit:
     build:
       context: ""
       dockerfile: dockerfile
@@ -24,7 +75,7 @@ services:
       - ./volumes/transit/logs:/vault/logs
       - ./volumes/transit/files:/vault/files
       - ./volumes/transit/config:/vault/config
-      - ./volumes/transit/config:/vault/audit
+      - ./volumes/transit/audit:/vault/audit
 
     cap_add:
       - IPC_LOCK
@@ -58,7 +109,7 @@ services:
       - ./volumes/vault/logs:/vault/logs
       - ./volumes/vault/files:/vault/files
       - ./volumes/vault/config:/vault/config
-      - ./volumes/vault/config:/vault/audit
+      - ./volumes/vault/audit:/vault/audit
 
     cap_add:
       - IPC_LOCK

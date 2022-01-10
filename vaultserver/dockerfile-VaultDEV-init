@@ -1,9 +1,7 @@
 
 # create an alpine image with bash, Hashicorp Vault
 FROM vault as vaultupdated
-RUN apk -U upgrade && \
-    apk cache clean && \
-    setcap cap_ipc_lock= /usr/sbin/vault
+RUN apk --no-cache upgrade
 
 FROM vaultupdated
 # required for vault token create -id
