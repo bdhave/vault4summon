@@ -1,9 +1,3 @@
-﻿FROM vault as vaultupdated
-RUN apk --no-cache -U upgrade && \
-    apk add libcap && \
-    apk cache clean && \
-    setcap cap_ipc_lock= /usr/sbin/vault
-
-FROM vaultupdated
-WORKDIR .
-
+﻿FROM vault
+RUN apk --no-cache upgrade && \
+   setcap cap_ipc_lock= /bin/vault
