@@ -29,7 +29,7 @@ func main() {
 
 func checkArgument() {
 	if len(os.Args) != 2 {
-		exitIfError(fmt.Errorf("%s", "ERROR: a variable ID or version flag(-v or --version) must be given as the first and only one argument!"))
+		exitIfError(fmt.Errorf("%s", "ERROR: a variable ID or version flag(-v or --version) must be given as the only one argument!"))
 	}
 }
 
