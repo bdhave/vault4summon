@@ -10,7 +10,7 @@ WORKDIR tmp
 COPY vault-DEV-config .
 RUN vault policy write ULYSSE-developer ./ULYSSE-developer.hcl && \
     vault policy write ULYSSE-operation ./ULYSSE-operation.hcl && \
-    vault policy write ULYSSE-server ./ULYSSE-server.hcl && \
+    vault policy write ULYSSE-servers ./ULYSSE-servers.hcl && \
     vault policy write ULYSSE-server-prod ./ULYSSE-server-prod.hcl && \
     vault kv put secret/DIGIT/ULYSSE/dev password=my-long-password-dev && \
     vault kv put secret/DIGIT/ULYSSE/test password=my-long-password-test && \
@@ -18,5 +18,5 @@ RUN vault policy write ULYSSE-developer ./ULYSSE-developer.hcl && \
     vault kv put secret/DIGIT/ULYSSE/prod password=my-long-password-prod && \
     vault token create -id dev -policy=ULYSSE-developer -display-name Developers && \
     vault token create -id ops policy=ULYSSE-operation -display-name Operational Team && \
-    vault token create -id dc -policy=ULYSSE-server -display-name DC && \
+    vault token create -id dc -policy=ULYSSE-servers -display-name DC && \
     vault token create -id dcPROD -policy=ULYSSE-server-prod -display-name DC PROD

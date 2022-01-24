@@ -1,6 +1,6 @@
 path "secret/DIGIT/ULYSSE/*" {
-  capabilities = ["deny"]
+  capabilities = ["list", "read"]
 }
 path "secret/DIGIT/ULYSSE/prod/*" {
-  capabilities = ["read"]
+  capabilities = ["deny"]
 }
