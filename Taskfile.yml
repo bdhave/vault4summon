@@ -83,7 +83,7 @@ tasks:
     cmds:
       - vault policy write ULYSSE-developer vault-DEV-config/ULYSSE-developer.hcl
       - vault policy write ULYSSE-operation vault-DEV-config/ULYSSE-operation.hcl
-      - vault policy write ULYSSE-server vault-DEV-config/ULYSSE-server.hcl
+      - vault policy write ULYSSE-servers vault-DEV-config/ULYSSE-servers.hcl
       - vault policy write ULYSSE-server-prod vault-DEV-config/ULYSSE-server-prod.hcl
 
   dev:init:_secrets:
@@ -105,7 +105,7 @@ tasks:
     cmds:
       - sudo --stdin vault token create -id dev -policy=ULYSSE-developer -display-name Developers
       - sudo --stdin vault token create -id ops policy=ULYSSE-operation -display-name Operational Team
-      - sudo --stdin vault token create -id dc -policy=ULYSSE-server -display-name DC
+      - sudo --stdin vault token create -id dc -policy=ULYSSE-servers -display-name DC
       - sudo --stdin vault token create -id dcPROD -policy=ULYSSE-server-prod -display-name DC PROD
 
   compose-run-transit:

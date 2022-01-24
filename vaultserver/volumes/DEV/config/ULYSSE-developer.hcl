@@ -5,17 +5,9 @@ path "secret/DIGIT/ULYSSE/*" {
 }
 
 path "secret/DIGIT/ULYSSE/dev/*" {
-  capabilities = ["create", "read", "update", "delete", "list"]
+  capabilities = ["create", "read", "update", "delete"]
 }
 
 path "secret/DIGIT/ULYSSE/test/*" {
-  capabilities = ["create", "read", "update", "delete", "list"]
-}
-
-path "secret/DIGIT/ULYSSE/acc/*" {
-  capabilities = ["read"]
-}
-
-path "secret/DIGIT/ULYSSE/prod/*" {
-  capabilities = ["list"]
+  capabilities = ["create", "read", "update", "delete"]
 }
