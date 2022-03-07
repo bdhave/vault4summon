@@ -6,7 +6,7 @@ licence [here](https://ec.europa.eu/isa2/solutions/european-union-public-licence
 > The work on this software project is in no way associated with my employer nor with the role I'm having at my employer. Any requests for changes will be decided upon exclusively by myself based on my personal preferences. I maintain this project as much or as little as my spare time permits.
 
 **WARNING: the current code was only tested with a Hashicorp Vault Server in development mode.
-**It must therefore be considered as a Proof of Concept, and it is not intended to be used in production 
+**It must therefore be considered as a Proof of Concept, and it is not intended to be used in production
 until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084) is  closed**
 
 ## Quick start
@@ -15,12 +15,48 @@ until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084)
   * `go build`
 * Install
   * Copy `vault4summon` to `/usr/local/lib/summon/`
-* Configure 
+* Configure
   * Set the [environment variables](https://www.vaultproject.io/docs/commands#environment-variables)
     to access Hashicorp Vault
     * `VAULT_ADDR`: e.g. http://127.0.0.1:8200/.
     * `VAULT_TOKEN`: e.g. 00000000-0000-0000-0000-000000000000
 * Use Summon
+
+### Using Nix
+
+[Nix][nix website] is a tool that takes a unique approach to package
+management and system configuration.
+
+[Nix Flakes][nix flakes wiki] are an upcoming feature of the Nix package manager.
+
+[Flakes][nix flakes] allow to define inputs (*you can think of them as dependencies*) and outputs of packages in a declarative way.
+
+You will notice similarities to what you find in package definitions for other languages and like many language package managers flakes also introduce dependency pinning using a lockfile (`flake.lock`).
+
+If you're willing to contribute and develop in `vault4summon`, a Flake file is shipped within this project.
+
+The development environment provides the following tools:
+
+* [go][go language]
+* [summon][summon website]
+
+To enter in a development environment, run:
+
+```bash
+nix develop
+```
+
+or
+
+```bash
+nix shell
+```
+
+If you just want to just build `vault4summon` locally, run:
+
+```bash
+nix build
+```
 
 ## Summon provider contract
 
@@ -48,7 +84,7 @@ The Vault CLI to retrieve a secret is
 
 This provider has 2 implemented formats for Variable ID:
 
-* secret/name#mysecretkeypath as used 
+* secret/name#mysecretkeypath as used
   by [AWS Secrets Manager provider](https://github.com/cyberark/summon-aws-secrets)
 * secret/name/mysecretkeypath as used
   by [Keepass kdbx database file provider](https://github.com/mskarbek/summon-keepass)
@@ -73,3 +109,9 @@ as possible. Please also make sure your code compiles and passes tests.
 
 Before your code can be accepted into the project, you must also sign the Individual Contributor License Agreement. I
 use [cla-assistant.io](https://cla-assistant.io). You will be prompted to sign once a pull request is opened.
+
+[nix website]: https://nixos.org/
+[nix flakes wiki]: https://nixos.wiki/wiki/Flakes
+[nix flakes]: https://www.tweag.io/blog/2020-05-25-flakes/
+[go language]: https://go.dev/
+[summon website]: https://cyberark.github.io/summon/
