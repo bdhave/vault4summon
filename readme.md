@@ -57,7 +57,11 @@ If you just want to just build `vault4summon` locally, run:
 ```bash
 nix build
 ```
-
+##### note
+Flakes and commands are still experimental features, they will be piushed to production level in 2022. So you still need a ~/.config/nix/nix.conf file with at least this line:
+```
+experimental-features = nix-command flakes
+```
 ## Summon provider contract
 
 Providers for Summon are easy to write. Given the identifier of a secret, they either return its value or an error.
