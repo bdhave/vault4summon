@@ -24,7 +24,7 @@ jobs:
     - name: Test
       run:  go test ./...
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: vault4summon linux amd64
         path: vault4summon
