@@ -9,7 +9,7 @@ vars:
     sh: pwd
   ADDR_DEFAULT: "[::]"
   DEV_ADDR: '{{.ADDR_DEFAULT}}:{{.DEV_PORT}}'
-  DEV_PORT: 8100
+  DEV_PORT: 8200
   DEV_OPTIONS:  '{"listener": [{"tcp":{"address": "{{.DEV_ADDR}}","tls_disable":"1"}}], "ui": true, "api_addr": "http://127.0.0.1:{{.DEV_PORT}}"}'
   DEV_ROOT_TOKEN_ID: SP2021
 
@@ -64,14 +64,14 @@ tasks:
           -e 'VAULT_LOCAL_CONFIG={{.DEV_OPTIONS}}'
           -p {{.DEV_PORT}}:{{.DEV_PORT}}/tcp dockerfile-VaultDEV-init vaultinit
 
-  docker run -it --rm \
-    --env VAULT_TOKEN:={{.DEV_ROOT_TOKEN_ID}} \
-    --env VAULT_ADDR=http://localhost:.DEV_PORT \
-    --link vault \
-    --name summon summon
-      - task: dev:init:_policies
-      - task: dev:init:_secrets
-      - task: dev:init:_tokens
+#  docker run -it --rm \
+#    --env VAULT_TOKEN:={{.DEV_ROOT_TOKEN_ID}} \
+#    --env VAULT_ADDR=http://localhost:.DEV_PORT \
+#    --link vault \
+#    --name summon summon
+#      - task: dev:init:_policies
+#      - task: dev:init:_secrets
+#      - task: dev:init:_tokens
 
   dev:init:_policies:
     env:

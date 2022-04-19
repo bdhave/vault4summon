@@ -12,3 +12,4 @@ initialization.json
 /vaultserver/volumes/vault/audit
 /vaultserver/volumes/transit/config/token.json
 /result/
+

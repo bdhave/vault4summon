@@ -1,7 +1,6 @@
-# vault4summon: this project implement a [CyberArk Summon](https://cyberark.github.io/summon/) provider using [Hashicorp Vault](https://www.vaultproject.io/) as secrets provider
+$# vault4summon: this project implement a [CyberArk Summon][summon website] provider using [Hashicorp Vault][Hashicorp Vault] as secrets provider.
 >This project is distributed under the terms of the European Union Public Licence (EUPL) Version 1.2 or newer.`
-You can find the latest version of the EUPL
-licence [here](https://ec.europa.eu/isa2/solutions/european-union-public-licence-eupl_en).
+You can find the latest version of the EUPL licence [here][EUPL].
 
 > The work on this software project is in no way associated with my employer nor with the role I'm having at my employer. Any requests for changes will be decided upon exclusively by myself based on my personal preferences. I maintain this project as much or as little as my spare time permits.
 
@@ -14,6 +13,7 @@ until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084)
 * Build or download vault4summon
   * `go build`
 * Install
+  * Install [Summon][summon website] if you don't hzve it already
   * Copy `vault4summon` to `/usr/local/lib/summon/`
 * Configure
   * Set the [environment variables](https://www.vaultproject.io/docs/commands#environment-variables)
@@ -115,7 +115,9 @@ Before your code can be accepted into the project, you must also sign the Indivi
 use [cla-assistant.io](https://cla-assistant.io). You will be prompted to sign once a pull request is opened.
 
 [nix website]: https://nixos.org/
-[nix flakes wiki]: https://nixos.wiki/wiki/Flakes
+[nix flakes wiki]: https://nixos.wiki/wiki/Flakes/
 [nix flakes]: https://www.tweag.io/blog/2020-05-25-flakes/
 [go language]: https://go.dev/
 [summon website]: https://cyberark.github.io/summon/
+[Hashicorp Vault]: https://www.vaultproject.io/
+[EUPL]: https://ec.europa.eu/isa2/solutions/european-union-public-licence-eupl_en/
