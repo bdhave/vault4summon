@@ -1,4 +1,4 @@
-$# vault4summon: this project implement a [CyberArk Summon][summon website] provider using [Hashicorp Vault][Hashicorp Vault] as secrets provider.
+# vault4summon: this project implement a [CyberArk Summon][summon website] provider using [Hashicorp Vault][Hashicorp Vault] as secrets provider.
 >This project is distributed under the terms of the European Union Public Licence (EUPL) Version 1.2 or newer.`
 You can find the latest version of the EUPL licence [here][EUPL].
 
@@ -13,7 +13,7 @@ until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084)
 * Build or download vault4summon
   * `go build`
 * Install
-  * Install [Summon][summon website] if you don't hzve it already
+  * Install [Summon][summon website] if you don't have it already installed
   * Copy `vault4summon` to `/usr/local/lib/summon/`
 * Configure
   * Set the [environment variables](https://www.vaultproject.io/docs/commands#environment-variables)
@@ -89,9 +89,9 @@ The Vault CLI to retrieve a secret is
 This provider has 2 implemented formats for Variable ID:
 
 * secret/name#mysecretkeypath as used
-  by [AWS Secrets Manager provider](https://github.com/cyberark/summon-aws-secrets)
+  by [AWS Secrets Manager provider][AWS-summon]
 * secret/name/mysecretkeypath as used
-  by [Keepass kdbx database file provider](https://github.com/mskarbek/summon-keepass)
+  by [Keepass kdbx database file provider][Keepass] or [Gopass provider][Gopass]
 
 So the two commands below return the same value
 
@@ -112,12 +112,18 @@ When submitting code, please make efforts to follow existing conventions and sty
 as possible. Please also make sure your code compiles and passes tests.
 
 Before your code can be accepted into the project, you must also sign the Individual Contributor License Agreement. I
-use [cla-assistant.io](https://cla-assistant.io). You will be prompted to sign once a pull request is opened.
+use [cla-assistant.io][cla]. You will be prompted to sign once a pull request is opened.
+
+[go language]: https://go.dev/
+[summon website]: https://cyberark.github.io/summon/
+[Hashicorp Vault]: https://www.vaultproject.io/
+[AWS-summon]: https://github.com/cyberark/summon-aws-secrets
+[Keepass]: https://github.com/mskarbek/summon-keepass
+[Gopass]: https://github.com/gopasspw/gopass-summon-provider
 
 [nix website]: https://nixos.org/
 [nix flakes wiki]: https://nixos.wiki/wiki/Flakes/
 [nix flakes]: https://www.tweag.io/blog/2020-05-25-flakes/
-[go language]: https://go.dev/
-[summon website]: https://cyberark.github.io/summon/
-[Hashicorp Vault]: https://www.vaultproject.io/
+
 [EUPL]: https://ec.europa.eu/isa2/solutions/european-union-public-licence-eupl_en/
+[cla]: https://cla-assistant.io
