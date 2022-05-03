@@ -8,12 +8,12 @@ vars:
   PROJECT_ROOT:
     sh: pwd
   ADDR_DEFAULT: "[::]"
+  DEV_PORT: 8200
+  DEV_ADDR: '{{.ADDR_DEFAULT}}:{{.DEV_PORT}}'
   DEV_OPTIONS:  '{"listener": [{"tcp":{"address": "{{.DEV_ADDR}}","tls_disable":"1"}}], "ui": true, "api_addr": "http://127.0.0.1:{{.DEV_PORT}}"}'
   DEV_ROOT_TOKEN_ID: SP2021
 
   VAULT_PORT: 8200
-  DEV_PORT: 8200
-  DEV_ADDR: '{{.ADDR_DEFAULT}}:{{.DEV_PORT}}'
 #  DEV_OPTIONS:  '{"listener": [{"tcp":{"address": "{{.DEV_ADDR}}","tls_disable":"1"}}], "ui": true, "api_addr": "http://127.0.0.1:{{.DEV_PORT}}"}'
  # DEV_OPTIONS:  '{"listener": [{"tcp":{"address": "{{.DEV_ADDR}}","tls_disable":"1"}}], "ui": true, "api_addr": "http://127.0.0.1:8101"}'
   VAULT_DEV_ROOT_TOKEN_ID: SP2021
