@@ -1,6 +1,6 @@
 module vault4summon
 
-go 1.17
+go 1.18
 
 require github.com/hashicorp/vault/api v1.5.0
 
