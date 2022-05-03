@@ -52,11 +52,11 @@ type CommandError struct {
 
 func (e *CommandError) Error() string {
 	description := fmt.Sprintf("When executing %s %s", e.command, strings.Join(e.args, " "))
-	var stdout = ""
+	stdout := ""
 	if len(e.stdout) > 0 {
 		stdout = "\n" + string(e.stdout)
 	}
-	var stderr = ""
+	stderr := ""
 	if len(e.stderr) > 0 {
 		stderr = "\nstderr:\n" + string(e.stderr)
 	}

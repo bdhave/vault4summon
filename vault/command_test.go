@@ -13,7 +13,7 @@ func TestNewSecretID(t *testing.T) {
 		expectedValid bool
 	}
 
-	var tests = []test{
+	tests := []test{
 		{"AWS format", "secret/hello#foo", &secretID{
 			Path: "secret/hello",
 			Key:  "foo",
