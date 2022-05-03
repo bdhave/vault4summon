@@ -22,7 +22,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
-        goversion: 1.17
+        goversion: 1.18
         binary_name: "vault4summon"
         sha256sum: TRUE
         md5sum: TRUE
