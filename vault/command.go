@@ -2,8 +2,9 @@ package vault
 
 import (
 	"fmt"
-	"github.com/hashicorp/vault/api"
 	"strings"
+
+	"github.com/hashicorp/vault/api"
 )
 
 type secretID struct {
@@ -18,10 +19,10 @@ func (i secretID) sanitize(argument string) (string, string, error) {
 		return "", "", fmt.Errorf("SYNTAX ERROR: secretID %q contains %d '#'. Maximum ONE '#' is allowed", argument, countCross)
 	}
 
-	var path = argument
+	path := argument
 	var key string
 	if countCross == 1 {
-		var arguments = strings.SplitN(argument, "#", 2)
+		arguments := strings.SplitN(argument, "#", 2)
 		path = arguments[0]
 		key = arguments[1]
 		if strings.Count(key, "/") > 0 {
@@ -32,7 +33,7 @@ func (i secretID) sanitize(argument string) (string, string, error) {
 		}
 	}
 
-	var parts = strings.Split(path, "/")
+	parts := strings.Split(path, "/")
 	if len(parts) == 1 {
 		return "", "", fmt.Errorf("SYNTAX ERROR: secretID %q DOESN'T contain any slash or '#'", argument)
 	}
@@ -81,7 +82,7 @@ func GetSecret(key string) (string, error) {
 	}
 
 	// use KvV2 as a first try
-	var isVaultEngineV2 = true
+	isVaultEngineV2 := true
 	var id *secretID
 	id, err = newSecretID(key)
 	if err != nil {
@@ -112,9 +113,8 @@ func isMetadataPresent(secret *api.Secret) bool {
 }
 
 func getSecrets(id *secretID, client *api.Client, isVaultEngineV2 bool) (*api.Secret, error) {
-	var path = normalizePath(id.Path, isVaultEngineV2)
+	path := normalizePath(id.Path, isVaultEngineV2)
 	secret, err := client.Logical().Read(path)
-
 	if err != nil {
 		return nil, err
 	}
@@ -154,6 +154,6 @@ func normalizePath(path string, isVaultEngineV2 bool) string {
 	if !isVaultEngineV2 {
 		return path
 	}
-	var parts = strings.SplitN(path, "/", 2)
+	parts := strings.SplitN(path, "/", 2)
 	return parts[0] + "/data/" + parts[1]
 }

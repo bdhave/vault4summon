@@ -7,14 +7,19 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
 	"vaultserver/common"
 )
 
-const InitializationFilename = "config/initialization.json"
-const auditFilename = "audit/audit.log"
+const (
+	InitializationFilename = "config/initialization.json"
+	auditFilename          = "audit/audit.log"
+)
 
-const vaultAddr = "VAULT_ADDR"
-const vaultToken = "VAULT_TOKEN"
+const (
+	vaultAddr  = "VAULT_ADDR"
+	vaultToken = "VAULT_TOKEN"
+)
 
 type status struct {
 	Type         string   `json:"type"`
@@ -156,13 +161,13 @@ func initialize(fullFileName string, recoveryKey bool) (*status, *Initialization
 	if err = wrapCommandError(err); err != nil {
 		return nil, nil, err
 	}
-	var initialization = &Initialization{}
+	initialization := &Initialization{}
 	err = json.Unmarshal(jsonData, initialization)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	err = ioutil.WriteFile(fullFileName, jsonData, 0644)
+	err = ioutil.WriteFile(fullFileName, jsonData, 0o644)
 	if err != nil {
 		return nil, initialization, err
 	}
@@ -184,7 +189,7 @@ func setToken(initialization *Initialization) error {
 }
 
 func EnableAudit(fullFileName string) error {
-	var _, err = common.Execute("vault",
+	_, err := common.Execute("vault",
 		nil,
 		"audit", "enable", "file", "file_path="+fullFileName)
 	if err = wrapCommandError(err); err != nil {
@@ -194,7 +199,7 @@ func EnableAudit(fullFileName string) error {
 }
 
 func enableTransit() error {
-	var _, err = common.Execute("vault",
+	_, err := common.Execute("vault",
 		nil,
 		"secrets", "enable", "transit")
 	if err = wrapCommandError(err); err != nil {
@@ -238,7 +243,7 @@ func createToken(fullFileName string) (*tokenInfo, error) {
 		return nil, err
 	}
 
-	err = ioutil.WriteFile(fullFileName, jsonData, 0644)
+	err = ioutil.WriteFile(fullFileName, jsonData, 0o644)
 	if err != nil {
 		return nil, err
 	}
@@ -250,6 +255,7 @@ func createToken(fullFileName string) (*tokenInfo, error) {
 	return tokenInfo, err
 }
 
+//goland:noinspection GoUnusedExportedFunction
 func UnWrap() (string, error) {
 	jsonData, err := common.Execute("vault",
 		nil,

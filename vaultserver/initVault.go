@@ -16,7 +16,7 @@ func main() {
 		command.ExitIfError(err)
 	*/
 	var _ *command.Initialization
-	var fullFileName = command.FullFileName(command.InitializationFilename)
+	fullFileName := command.FullFileName(command.InitializationFilename)
 	_, _, err := command.InitializeVault(fullFileName, true)
 	command.ExitIfError(err)
 }
