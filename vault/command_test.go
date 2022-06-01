@@ -15,8 +15,9 @@ func TestNewSecretID(t *testing.T) {
 
 	tests := []test{
 		{"AWS format", "secret/hello#foo", &secretID{
-			Path: "secret/hello",
-			Key:  "foo",
+			Path:      "secret/hello",
+			Key:       "foo",
+			awsFormat: true,
 		}, true},
 		{"invalid AWS format with 2 #", "secret/hello##foo", nil, false},
 		{"invalid AWS format ending with #", "secret/hello#", nil, false},
@@ -26,8 +27,9 @@ func TestNewSecretID(t *testing.T) {
 		{"invalid AWS format with double slash#", "secret//hello#foo", nil, false},
 
 		{"Keepass format", "secret/hello/foo", &secretID{
-			Path: "secret/hello",
-			Key:  "foo",
+			Path:      "secret/hello",
+			Key:       "foo",
+			awsFormat: false,
 		}, true},
 		{"Invalid Keepass format ending with slash", "secret/hello/foo/", nil, false},
 		{"Invalid Keepass format starting with slash", "/secret/hello/foo", nil, false},
