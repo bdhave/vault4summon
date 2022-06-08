@@ -2,7 +2,7 @@ module vault4summon
 
 go 1.18
 
-require github.com/hashicorp/vault/api v1.7.0
+require github.com/hashicorp/vault/api v1.7.1
 
 require (
 	github.com/armon/go-metrics v0.3.9 // indirect
