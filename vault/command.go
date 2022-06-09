@@ -14,18 +14,18 @@ type secretID struct {
 }
 
 func newSecretID(argument string) (*secretID, error) {
-	var id = &secretID{} //nolint:exhaustivestruct
-	path, key, awsFormat, err := id.sanitize(argument)
+	secretID := &secretID{} //nolint:exhaustivestruct
+	path, key, awsFormat, err := secretID.sanitize(argument)
 
 	if err != nil {
 		return nil, err
 	}
 
-	id.Path = path
-	id.Key = key
-	id.awsFormat = awsFormat
+	secretID.Path = path
+	secretID.Key = key
+	secretID.awsFormat = awsFormat
 
-	return id, nil
+	return secretID, nil
 }
 
 func (i secretID) sanitize(argument string) (string, string, bool, error) {
@@ -100,10 +100,7 @@ func GetSecret(key string) (string, error) {
 		return "", err
 	}
 
-	// use KvV2 as a first try
-	isVaultEngineV2 := true
 	secretID, err := newSecretID(key)
-
 	if err != nil {
 		return "", err
 	}
@@ -115,6 +112,8 @@ func GetSecret(key string) (string, error) {
 		return "", err
 	}
 
+	// use KvV2 as a first try
+	isVaultEngineV2 := true
 	// check if metadata is present. If true, vault V2 is the right API
 	if !isMetadataPresent(secret) {
 		// no metadata, so fall to KvV1
@@ -142,11 +141,11 @@ func getSecrets(id *secretID, client *api.Client, isVaultEngineV2 bool) (*api.Se
 	}
 
 	if secret == nil {
-		return nil, fmt.Errorf("no secret for path %s\n", id.Path)
+		return nil, fmt.Errorf("no secret for path %s", id.Path)
 	}
 
 	if len(secret.Warnings) > 0 {
-		return nil, fmt.Errorf("%s\n", strings.Join(secret.Warnings, ". "))
+		return nil, fmt.Errorf("%s", strings.Join(secret.Warnings, ". "))
 	}
 
 	return secret, nil
