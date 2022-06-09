@@ -14,7 +14,7 @@ type secretID struct {
 }
 
 func newSecretID(argument string) (*secretID, error) {
-	var id = &secretID{} //nolint:gofumpt
+	var id = &secretID{} //nolint:exhaustivestruct
 	path, key, awsFormat, err := id.sanitize(argument)
 
 	if err != nil {

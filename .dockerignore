@@ -2,7 +2,6 @@
 .git/
 .github/
 .run/
-result/
 target/
 privatenotes/
 vaultserver/

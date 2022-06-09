@@ -1,6 +1,6 @@
 FROM golang:alpine as golang-base
 RUN apk -U upgrade && apk cache clean
-workdir temp
+WORKDIR temp
 COPY go.mod .
 RUN go mod download
 WORKDIR ..
