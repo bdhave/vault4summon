@@ -88,7 +88,7 @@ func (e *secretIDError) Error() string {
 }
 
 func newSecretIDError(secretID string, msg string, args ...any) error {
-	return &secretIDError{secretID, fmt.Sprintf(msg, args)}
+	return &secretIDError{secretID, fmt.Sprintf(msg, args)} //nolint:govet
 }
 
 /*
