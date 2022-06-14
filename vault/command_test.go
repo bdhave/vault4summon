@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestNewSecretID(t *testing.T) {
+func TestNewSecretID(t *testing.T) { //nolint:paralleltest
 	type test struct {
 		name          string
 		argument      string
@@ -38,9 +38,12 @@ func TestNewSecretID(t *testing.T) {
 		{"Invalid without slash", "secret", nil, false},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range tests { //nolint:paralleltest
+		tt := tt
+
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := newSecretID(tt.argument)
+
 			if tt.expectedValid && err != nil {
 				t.Errorf("Unexpected error for %v: %v", tt.argument, err)
 			} else if !tt.expectedValid && err == nil {
