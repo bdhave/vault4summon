@@ -132,8 +132,8 @@ func isMetadataPresent(secret *api.Secret) bool {
 	return secret.Data["metadata"] != nil
 }
 
-func getSecrets(id *secretID, client *api.Client, isVaultEngineV2 bool) (*api.Secret, error) {
-	path := normalizePath(id.Path, isVaultEngineV2)
+func getSecrets(secretID *secretID, client *api.Client, isVaultEngineV2 bool) (*api.Secret, error) {
+	path := normalizePath(secretID.Path, isVaultEngineV2)
 	secret, err := client.Logical().Read(path)
 
 	if err != nil {
@@ -141,7 +141,7 @@ func getSecrets(id *secretID, client *api.Client, isVaultEngineV2 bool) (*api.Se
 	}
 
 	if secret == nil {
-		return nil, fmt.Errorf("no secret for path %s", id.Path)
+		return nil, fmt.Errorf("no secret for path %s", secretID.Path)
 	}
 
 	if len(secret.Warnings) > 0 {
@@ -158,6 +158,13 @@ func retrieveValue(secret *api.Secret, key string, isVaultEngineV2 bool) (string
 		data = nil
 		dataRaw := secret.Data["data"]
 
+		/*
+			var a interface{}
+			_, ok := a.(int)
+			if !ok { // type assertion failed
+				// handle error
+			}
+		*/
 		if dataRaw != nil {
 			data = dataRaw.(map[string]interface{})
 		}
