@@ -50,7 +50,7 @@ func (i secretID) sanitize(argument string) (string, string, bool, error) {
 		}
 
 		if len(key) < 1 {
-			return "", "", awsFormat, newSecretIDError(argument, "(AWS format) ends with '#'", argument)
+			return "", "", awsFormat, newSecretIDError(argument, "(AWS format) ends with '#'")
 		}
 	}
 
