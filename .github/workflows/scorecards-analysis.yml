@@ -32,7 +32,7 @@ jobs:
       - name: "Run analysis"
         uses: ossf/scorecard-action@f470ef7a6a8554dee1fdf48ee58505d5b8dfccb5 # v1.1.0
         with:
-          results_file: results.sarif
+          results_file: scorecards.sarif
           results_format: sarif
           # (Optional) Read-only PAT token. Uncomment the `repo_token` line below if:
           # - you want to enable the Branch-Protection check on a *public* repository, or
@@ -52,11 +52,11 @@ jobs:
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.0.0
         with:
           name: SARIF file
-          path: results.sarif
+          path: scorecards.sarif
           retention-days: 5
 
       # Upload the results to GitHub's code scanning dashboard.
       - name: "Upload to code-scanning"
         uses: github/codeql-action/upload-sarif@2e0c6caf16ddf7e90e391c48bda42895211a463a # v1.0.26
         with:
-          sarif_file: results.sarif
+          sarif_file: scorecards.sarif
