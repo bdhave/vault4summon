@@ -1,3 +1,4 @@
+//goland:noinspection GoLinter
 package vault
 
 import (
@@ -39,7 +40,6 @@ func TestNewSecretID(t *testing.T) { //nolint:paralleltest
 	}
 
 	for _, tt := range tests { //nolint:paralleltest
-		tt := tt
 
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := newSecretID(tt.argument)
