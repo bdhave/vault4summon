@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -167,7 +166,7 @@ func initialize(fullFileName string, recoveryKey bool) (*status, *Initialization
 		return nil, nil, err
 	}
 
-	err = ioutil.WriteFile(fullFileName, jsonData, 0o644)
+	err = os.WriteFile(fullFileName, jsonData, 0o600)
 	if err != nil {
 		return nil, initialization, err
 	}
@@ -243,7 +242,7 @@ func createToken(fullFileName string) (*tokenInfo, error) {
 		return nil, err
 	}
 
-	err = ioutil.WriteFile(fullFileName, jsonData, 0o644)
+	err = os.WriteFile(fullFileName, jsonData, 0o600)
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +300,7 @@ func Unseal(initialization *Initialization, fullFileName string) (*status, error
 
 func ReadInitialization(initialization *Initialization, fullFileName string) (*Initialization, error) {
 	if initialization == nil {
-		dat, err := ioutil.ReadFile(fullFileName)
+		dat, err := os.ReadFile(fullFileName)
 		if err != nil {
 			return nil, err
 		}
