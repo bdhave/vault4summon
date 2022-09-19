@@ -11,9 +11,7 @@ until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084)
 ## Quick start
 
 * Get vault4summon
-  * download it
-  * or build it
-  * or use [Nix](useNix4Go.md) to create your Go environment to build it
+  * Download it or build it if you have a Go compiler or use [Nix](useNix4Go.md) to create your Go environment.
 * Install
   * Install [Summon][summon website] if you don't have it already installed
   * Copy `vault4summon` to `/usr/local/lib/summon/`
