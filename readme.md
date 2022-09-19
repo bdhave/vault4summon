@@ -71,8 +71,8 @@ a pull request.
 When submitting code, please make efforts to follow existing conventions and style in order to keep the code as readable
 as possible. Please also make sure your code compiles and passes tests.
 
-Before your code can be accepted into the project, you must also sign the Individual Contributor License Agreement. I
-use [cla-assistant.io][cla]. You will be prompted to sign once a pull request is opened.
+~~Before your code can be accepted into the project, you must also sign the Individual Contributor License Agreement. I
+use [cla-assistant.io][cla]. You will be prompted to sign once a pull request is opened.~~
 
 [go language]: https://go.dev/
 [summon website]: https://cyberark.github.io/summon/
