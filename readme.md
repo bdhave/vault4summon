@@ -1,4 +1,4 @@
-# vault4summon: this project implement a [CyberArk Summon][summon website] provider using [Hashicorp Vault][Hashicorp Vault] as secrets provider.
+# vault4summon: this project implements a [CyberArk Summon][summon website] provider using [Hashicorp Vault][Hashicorp Vault] as secrets provider.
 >This project is distributed under the terms of the European Union Public Licence (EUPL) Version 1.2 or newer.`
 You can find the latest version of the EUPL licence [here][EUPL].
 
