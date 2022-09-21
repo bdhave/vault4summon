@@ -20,7 +20,7 @@ const (
 	vaultToken = "VAULT_TOKEN"
 )
 
-type status struct {
+type Status struct {
 	Type         string   `json:"type"`
 	Initialized  bool     `json:"initialized"`
 	Sealed       bool     `json:"sealed"`
@@ -103,7 +103,7 @@ func Setup(address string) {
 	}
 }
 
-func GetStatus() (*status, error) {
+func GetStatus() (*Status, error) {
 	const sealedVaultStatusCommandExitCode int = 2
 
 	jsonData, err := common.Execute("vault",
@@ -112,12 +112,12 @@ func GetStatus() (*status, error) {
 	if err != nil {
 		return nil, err
 	}
-	status := &status{}
+	status := &Status{}
 	err = json.Unmarshal(jsonData, status)
 	return status, err
 }
 
-func InitializeTransit(fullFileName string) (*status, *Initialization, error) {
+func InitializeTransit(fullFileName string) (*Status, *Initialization, error) {
 	status, initialization, err := initialize(fullFileName, false)
 	if err != nil {
 		return status, initialization, err
@@ -136,7 +136,7 @@ func InitializeTransit(fullFileName string) (*status, *Initialization, error) {
 	return status, initialization, err
 }
 
-func InitializeVault(fullFileName string, recoveryKey bool) (*status, *Initialization, error) {
+func InitializeVault(fullFileName string, recoveryKey bool) (*Status, *Initialization, error) {
 	status, initialization, err := initialize(fullFileName, recoveryKey)
 	if err != nil {
 		return status, initialization, err
@@ -144,7 +144,7 @@ func InitializeVault(fullFileName string, recoveryKey bool) (*status, *Initializ
 	return status, initialization, nil
 }
 
-func initialize(fullFileName string, recoveryKey bool) (*status, *Initialization, error) {
+func initialize(fullFileName string, recoveryKey bool) (*Status, *Initialization, error) {
 	var jsonData []byte
 	var err error
 
@@ -265,7 +265,7 @@ func UnWrap() (string, error) {
 	return string(jsonData), nil
 }
 
-func Unseal(initialization *Initialization, fullFileName string) (*status, error) {
+func Unseal(initialization *Initialization, fullFileName string) (*Status, error) {
 	status, err := GetStatus()
 	if err != nil || !status.Sealed {
 		return status, err
@@ -300,6 +300,7 @@ func Unseal(initialization *Initialization, fullFileName string) (*status, error
 
 func ReadInitialization(initialization *Initialization, fullFileName string) (*Initialization, error) {
 	if initialization == nil {
+		fullFileName = filepath.Clean(fullFileName)
 		dat, err := os.ReadFile(fullFileName)
 		if err != nil {
 			return nil, err
