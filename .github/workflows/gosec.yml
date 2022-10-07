@@ -34,7 +34,7 @@ jobs:
           # we let the report trigger content trigger a failure using the GitHub Security features.
           args: '-no-fail -fmt sarif -out gosec.sarif ./...'
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@3d392940475e4c472e143ff2fd41aaffb1178094
+        uses: github/codeql-action/upload-sarif@c6c7d293ca64d6a7e953b9680a26c5ffea86a392
         with:
           # Path to SARIF file relative to the root of the repository
           sarif_file: gosec.sarif
