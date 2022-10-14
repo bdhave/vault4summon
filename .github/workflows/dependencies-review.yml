@@ -16,4 +16,4 @@ jobs:
       - name: 'Checkout Repository'
         uses: actions/checkout@8230315d06ad95c617244d2f265d237a1682d445
       - name: 'Dependency Review'
-        uses: actions/dependency-review-action@9c96258789e5d9e85fe4ca86115ba4cc62b780cf
+        uses: actions/dependency-review-action@fd675ced9c17f1393071e1a2e685ab527e585a0c
