@@ -23,7 +23,7 @@ jobs:
           proxy.golang.org:443
           storage.googleapis.com:443
 
-    - uses: actions/checkout@1f9a0c22da41e6ebfa534300ef656657ea2c6707
+    - uses: actions/checkout@bf085276cecdb0cc76fbbe0687a5a0e786646936
 
     - name: Set up Go
       uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f
