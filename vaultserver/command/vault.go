@@ -4,20 +4,18 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
-
+	"strings"
 	"vaultserver/common"
+
+	"github.com/hashicorp/vault/api"
 )
 
 const (
 	InitializationFilename = "config/initialization.json"
 	auditFilename          = "audit/audit.log"
-)
-
-const (
-	vaultAddr  = "VAULT_ADDR"
-	vaultToken = "VAULT_TOKEN"
 )
 
 type Status struct {
@@ -80,26 +78,26 @@ func SetupWithToken(address string) {
 	if len(os.Args) > 2 {
 		ExitIfError(errors.New("this application accepts ONE and ONLY ONE argument, the token"))
 	}
-	if len(os.Getenv(vaultToken)) == 0 && len(os.Args) != 2 {
+	if len(os.Getenv(api.EnvVaultToken)) == 0 && len(os.Args) != 2 {
 		ExitIfError(fmt.Errorf(
 			"%s environment variable is not defined, you MUST gives the token as argument or define %s environment variable",
-			vaultToken, vaultToken))
+			api.EnvVaultToken, api.EnvVaultToken))
 	}
-	if len(os.Getenv(vaultToken)) == 0 {
-		_ = os.Setenv(vaultToken, os.Args[1])
+	if len(os.Getenv(api.EnvVaultToken)) == 0 {
+		_ = os.Setenv(api.EnvVaultToken, os.Args[1])
 	}
 
-	if len(os.Getenv(vaultToken)) == 0 {
+	if len(os.Getenv(api.EnvVaultToken)) == 0 {
 		ExitIfError(fmt.Errorf(
 			"%s environment variable is not defined, you MUST gives the token as argument or define %s environment variable",
-			vaultToken, vaultToken))
+			api.EnvVaultToken, api.EnvVaultToken))
 	}
 }
 
 func Setup(address string) {
-	if len(os.Getenv(vaultAddr)) == 0 {
-		_, _ = fmt.Fprintf(os.Stderr, "%s environment variable is not defined, set '%s' as default\n", vaultAddr, address)
-		_ = os.Setenv(vaultAddr, address)
+	if len(os.Getenv(api.EnvVaultAddress)) == 0 {
+		_, _ = fmt.Fprintf(os.Stderr, "%s environment variable is not defined, set '%s' as default\n", api.EnvVaultAddress, address)
+		_ = os.Setenv(api.EnvVaultAddress, address)
 	}
 }
 
@@ -184,7 +182,7 @@ func initialize(fullFileName string, recoveryKey bool) (*Status, *Initialization
 
 func setToken(initialization *Initialization) error {
 	token := initialization.RootToken
-	return os.Setenv(vaultToken, token)
+	return os.Setenv(api.EnvVaultToken, token)
 }
 
 func EnableAudit(fullFileName string) error {
@@ -301,6 +299,16 @@ func Unseal(initialization *Initialization, fullFileName string) (*Status, error
 func ReadInitialization(initialization *Initialization, fullFileName string) (*Initialization, error) {
 	if initialization == nil {
 		fullFileName = filepath.Clean(fullFileName)
+		path, err := os.Getwd()
+
+		if err != nil {
+			return nil, err
+		}
+		if err != nil || !strings.HasPrefix(fullFileName, path) {
+			log.Println(err)
+		}
+		fmt.Println(path) // for example /home/user
+
 		dat, err := os.ReadFile(fullFileName)
 		if err != nil {
 			return nil, err
