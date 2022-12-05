@@ -43,3 +43,5 @@ experimental-features = nix-command flakes
 [nix website]: https://nixos.org/
 [nix flakes wiki]: https://nixos.wiki/wiki/Flakes/
 [nix flakes]: https://www.tweag.io/blog/2020-05-25-flakes/
+[go language]: https://go.dev/
+[summon website]: https://cyberark.github.io/summon/
