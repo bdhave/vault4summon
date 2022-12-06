@@ -12,6 +12,8 @@ jobs:
         uses: step-security/harden-runner@0a5820a2ec510d2521c1715d24860fc8cd06400a
         with:
           egress-policy: block
+          allowed-endpoints: >
+            github.com:443
 
       - name: 'Checkout Repository'
         uses: actions/checkout@bf085276cecdb0cc76fbbe0687a5a0e786646936

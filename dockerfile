@@ -12,7 +12,7 @@ WORKDIR /source
 RUN go build -o target/vault4summon
 
 # create an alpine image with bash, Hashicorp Vault & CyberArk Summon
-FROM alpine:3.16 as alpine-base
+FROM alpine:sha256:c0d488a800e4127c334ad20d61d7bc21b4097540327217dfab52262adc02380c as alpine-base
 RUN apk -U upgrade && \
     apk add bash libcap vault git openssl && \
     apk cache clean && \
