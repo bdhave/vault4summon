@@ -13,10 +13,10 @@ jobs:
         with:
           disable-sudo: true
           egress-policy: block
-        allowed-endpoints: >
-          github.com:443
-          proxy.golang.org:443
-          storage.googleapis.com:443
+          allowed-endpoints: >
+            github.com:443
+            proxy.golang.org:443
+            storage.googleapis.com:443
 
       - name: 'Checkout Repository'
         uses: actions/checkout@bf085276cecdb0cc76fbbe0687a5a0e786646936
