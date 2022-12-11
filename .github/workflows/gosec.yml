@@ -7,7 +7,7 @@ on:
     branches:
       - master
   schedule:
-      - cron: '0 0 * * *'
+      - cron: '0 17 * * *'
 
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
@@ -30,7 +30,7 @@ jobs:
             github.com:443
             api.github.com:443
             proxy.golang.org:443
-            
+            storage.googleapis.com:443
 
       - name: Checkout Source
         uses: actions/checkout@bf085276cecdb0cc76fbbe0687a5a0e786646936
