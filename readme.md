@@ -17,7 +17,7 @@ until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084)
   * Copy `vault4summon` to `/usr/local/lib/summon/`
 * Configure
   * Set the [environment variables](https://www.vaultproject.io/docs/commands#environment-variables)
-    to access Hashicorp Vault
+    to access Hashicorp Vault. vault4summon supports same environment variables as 'vault kv get' command.
     * `VAULT_ADDR`: e.g. http://127.0.0.1:8200/.
     * `VAULT_TOKEN`: e.g. 00000000-0000-0000-0000-000000000000
 * Create a [secrets.yml](secrets.yml) file
