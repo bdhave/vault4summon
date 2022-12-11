@@ -7,7 +7,7 @@ on:
     branches:
       - master
   schedule:
-      - cron: '0 17 * * *' # see https://crontab.guru/ for more examples
+      - cron: '0 19 * * *' # see https://crontab.guru/ for more examples
 
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
@@ -25,12 +25,13 @@ jobs:
         uses: step-security/harden-runner@0a5820a2ec510d2521c1715d24860fc8cd06400a
         with:
           disable-sudo: true
-          egress-policy: audit
+          egress-policy: block
           allowed-endpoints: >
             github.com:443
             api.github.com:443
             proxy.golang.org:443
             storage.googleapis.com:443
+            artifactcache.actions.githubusercontent.com:443
 
       - name: Checkout Source
         uses: actions/checkout@bf085276cecdb0cc76fbbe0687a5a0e786646936
@@ -47,10 +48,10 @@ jobs:
           # Path to SARIF file relative to the root of the repository
           sarif_file: gosec.sarif
 
-      - name: "Upload artifact"
+      - name: Upload artifact
         uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
         with:
           name: Gosec SARIF file
           path: gosec.sarif
-          retention-days: 5
+          retention-days: 7
 
