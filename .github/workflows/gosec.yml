@@ -7,7 +7,7 @@ on:
     branches:
       - master
   schedule:
-      - cron: '0 19 * * *' # see https://crontab.guru/ for more examples
+      - cron: '0 0 * * *' # see https://crontab.guru/ for more examples
 
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
