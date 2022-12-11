@@ -157,14 +157,6 @@ func retrieveValue(secret *api.Secret, key string, isVaultEngineV2 bool) (string
 	if isVaultEngineV2 && data != nil {
 		data = nil
 		dataRaw := secret.Data["data"]
-
-		/*
-			var a interface{}
-			_, ok := a.(int)
-			if !ok { // type assertion failed
-				// handle error
-			}
-		*/
 		if dataRaw != nil {
 			data = dataRaw.(map[string]interface{})
 		}
