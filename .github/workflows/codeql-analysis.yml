@@ -18,7 +18,7 @@ on:
     # The branches below must be a subset of the branches above
     branches: [ main ]
   schedule:
-    - cron: '20 20 * * 5'
+    - cron: '20 20 * * 5' # see https://crontab.guru/ for more examples
 
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
