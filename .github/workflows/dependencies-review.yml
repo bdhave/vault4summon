@@ -12,8 +12,9 @@ jobs:
         uses: step-security/harden-runner@0a5820a2ec510d2521c1715d24860fc8cd06400a
         with:
           disable-sudo: true
-          egress-policy: audit
+          egress-policy: block
           allowed-endpoints: >
+            api.github.com:443
             github.com:443
             proxy.golang.org:443
             storage.googleapis.com:443
