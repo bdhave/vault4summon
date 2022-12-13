@@ -1,4 +1,4 @@
-name: Scorecards supply-chain security
+name: 'Scorecards supply-chain security'
 on:
   # Only the default branch is supported.
   branch_protection_rule:
@@ -13,7 +13,7 @@ permissions: read-all
 
 jobs:
   analysis:
-    name: Scorecards analysis
+    name: 'Scorecards analysis'
     runs-on: ubuntu-latest
     permissions:
       # Needed to upload the results to code-scanning dashboard.
@@ -24,7 +24,7 @@ jobs:
       contents: read
 
     steps:
-      - name: Harden Runner
+      - name: 'Harden Runner'
         uses: step-security/harden-runner@0a5820a2ec510d2521c1715d24860fc8cd06400a
         with:
           disable-sudo: true

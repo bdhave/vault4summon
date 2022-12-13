@@ -8,7 +8,7 @@ jobs:
   dependency-review:
     runs-on: ubuntu-latest
     steps:
-      - name: Harden Runner
+      - name: 'Harden Runner'
         uses: step-security/harden-runner@0a5820a2ec510d2521c1715d24860fc8cd06400a
         with:
           disable-sudo: true
