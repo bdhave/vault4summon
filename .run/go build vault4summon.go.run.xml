@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go build vault4summon.go" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+    <module name="vault4summon" />
+    <working_directory value="$PROJECT_DIR$" />
+    <parameters value="secret/hello#foo" />
+    <kind value="FILE" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/vault4summon.go" />
+    <method v="2" />
+  </configuration>
+</component>

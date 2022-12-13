@@ -9,7 +9,7 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
-name: "CodeQL"
+name: 'CodeQL'
 
 on:
   push:
@@ -18,7 +18,7 @@ on:
     # The branches below must be a subset of the branches above
     branches: [ main ]
   schedule:
-    - cron: '20 20 * * 5'
+    - cron: '20 20 * * 5' # see https://crontab.guru/ for more examples
 
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
@@ -29,7 +29,7 @@ jobs:
       actions: read  # for github/codeql-action/init to get workflow details
       contents: read  # for actions/checkout to fetch code
       security-events: write  # for github/codeql-action/autobuild to send a status report
-    name: Analyze
+    name: 'Analyze'
     runs-on: ubuntu-latest
 
     strategy:
@@ -41,7 +41,7 @@ jobs:
         # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
 
     steps:
-    - name: Harden Runner
+    - name: 'Harden Runner'
       uses: step-security/harden-runner@0a5820a2ec510d2521c1715d24860fc8cd06400a
       with:
         disable-sudo: true
@@ -53,12 +53,12 @@ jobs:
           storage.googleapis.com:443
           sum.golang.org:443
 
-    - name: Checkout repository
-      uses: actions/checkout@bf085276cecdb0cc76fbbe0687a5a0e786646936
+    - name: 'Checkout repository'
+      uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
 
     # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@896079047b4bb059ba6f150a5d87d47dde99e6e5
+    - name: 'Initialize CodeQL'
+      uses: github/codeql-action/init@899bf9c076bcf8a9b657dd1b6d6a8270f89f356a
       with:
         languages: ${{ matrix.language }}
         # If you wish to specify custom queries, you can do so here or in a config file.
@@ -68,8 +68,8 @@ jobs:
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@896079047b4bb059ba6f150a5d87d47dde99e6e5
+    - name: 'Autobuild'
+      uses: github/codeql-action/autobuild@899bf9c076bcf8a9b657dd1b6d6a8270f89f356a
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
@@ -82,5 +82,5 @@ jobs:
     #   make bootstrap
     #   make release
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@896079047b4bb059ba6f150a5d87d47dde99e6e5
+    - name: 'Perform CodeQL Analysis'
+      uses: github/codeql-action/analyze@899bf9c076bcf8a9b657dd1b6d6a8270f89f356a
