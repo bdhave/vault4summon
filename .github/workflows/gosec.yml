@@ -34,7 +34,7 @@ jobs:
             artifactcache.actions.githubusercontent.com:443
 
       - name: 'Checkout Source'
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+        uses: actions/checkout@885641592076c27bfb56c028cd5612cdad63e16d
 
       - name: 'Run Gosec Security Scanner'
         uses: securego/gosec@f9a8bf0152af9f9bda93de373ddb3762f0d12f14
