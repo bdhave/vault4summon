@@ -16,6 +16,14 @@ jobs:
     name: lint
     runs-on: ubuntu-latest
     steps:
+      - name: 'Harden Runner'
+        uses: step-security/harden-runner@0a5820a2ec510d2521c1715d24860fc8cd06400a
+        with:
+          disable-sudo: true
+          egress-policy: audit
+          allowed-endpoints: >
+            api.github.com:443
+
       - uses: actions/setup-go@6edd4406fa81c3da01a34fa6f6343087c207a568
         with:
           go-version: 1.19
