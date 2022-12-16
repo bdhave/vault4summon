@@ -22,7 +22,7 @@ jobs:
             github.com:443
 
       - name: 'Checkout'
-        uses: actions/checkout@885641592076c27bfb56c028cd5612cdad63e16d
+        uses: actions/checkout@3ba5ee6fac7e0e30e2ea884e236f282d3a775891
 
       - name: 'Set up Go'
         uses: actions/setup-go@bb5ff97ab9c85a2085c8968c49b14f9f0530e2a8
