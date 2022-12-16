@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@885641592076c27bfb56c028cd5612cdad63e16d
 
       - name: 'Set up Go'
-        uses: actions/setup-go@6edd4406fa81c3da01a34fa6f6343087c207a568
+        uses: actions/setup-go@bb5ff97ab9c85a2085c8968c49b14f9f0530e2a8
         with:
           go-version: 1.19.x
 
