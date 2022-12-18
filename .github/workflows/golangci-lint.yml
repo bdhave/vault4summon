@@ -23,11 +23,21 @@ jobs:
           egress-policy: audit
           allowed-endpoints: >
             api.github.com:443
+            github.com:443
+            objects.githubusercontent.com:443
+            raw.githubusercontent.com:443
 
       - uses: actions/setup-go@bb5ff97ab9c85a2085c8968c49b14f9f0530e2a8
         with:
-          go-version: 1.19
+          go-version-file: './go.mod'
+
       - uses: actions/checkout@3ba5ee6fac7e0e30e2ea884e236f282d3a775891
+        with:
+          fetch-depth: 0
+
+      - name: 'Generate'
+        run:  go generate vault4summon
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
