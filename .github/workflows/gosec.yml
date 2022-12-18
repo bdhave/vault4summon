@@ -22,7 +22,7 @@ jobs:
       GO111MODULE: on
     steps:
       - name: 'Harden Runner'
-        uses: step-security/harden-runner@0a5820a2ec510d2521c1715d24860fc8cd06400a
+        uses: step-security/harden-runner@266a5d6a507c6927766a67b8380f323eacd977a2
         with:
           disable-sudo: true
           egress-policy: block
@@ -34,7 +34,7 @@ jobs:
             artifactcache.actions.githubusercontent.com:443
 
       - name: 'Checkout Source'
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+        uses: actions/checkout@3ba5ee6fac7e0e30e2ea884e236f282d3a775891
 
       - name: 'Run Gosec Security Scanner'
         uses: securego/gosec@f9a8bf0152af9f9bda93de373ddb3762f0d12f14
@@ -43,7 +43,7 @@ jobs:
           args: '-no-fail -fmt sarif -out gosec.sarif ./...'
 
       - name: 'Upload SARIF file'
-        uses: github/codeql-action/upload-sarif@899bf9c076bcf8a9b657dd1b6d6a8270f89f356a
+        uses: github/codeql-action/upload-sarif@0a3f985290ed05d660eccad9acadea7a461a4aa8
         with:
           # Path to SARIF file relative to the root of the repository
           sarif_file: gosec.sarif

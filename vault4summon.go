@@ -1,15 +1,17 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"os"
-
 	"vault4summon/vault"
 )
 
-func version() string {
-	return "0.9.1"
-}
+// generate version from last tag created
+//
+//go:generate bash -c "printf %s $(git describe --tags --abbrev=0) > version.txt"
+//go:embed version.txt
+var version string
 
 func main() {
 	checkArgument()
@@ -19,7 +21,7 @@ func main() {
 	// Get the secret and key name from the argument
 	switch argument {
 	case "-v", "--version":
-		printSecret(version())
+		printVersion()
 	default:
 		result, err := vault.GetSecret(argument)
 
@@ -43,7 +45,16 @@ func exitIfError(err error) {
 	os.Exit(1)
 }
 
-func printSecret(result string) {
-	_, err := os.Stdout.Write([]byte(result))
+func printSecret(secret string) {
+	_, err := os.Stdout.Write([]byte(secret))
+	exitIfError(err)
+}
+
+func printVersion() {
+	if len(version) == 0 {
+		version = "dev"
+
+	}
+	_, err := os.Stdout.Write([]byte(version))
 	exitIfError(err)
 }

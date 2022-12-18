@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Harden Runner'
-        uses: step-security/harden-runner@0a5820a2ec510d2521c1715d24860fc8cd06400a
+        uses: step-security/harden-runner@266a5d6a507c6927766a67b8380f323eacd977a2
         with:
           disable-sudo: true
           egress-policy: block
@@ -20,7 +20,7 @@ jobs:
             storage.googleapis.com:443
 
       - name: 'Checkout Repository'
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+        uses: actions/checkout@3ba5ee6fac7e0e30e2ea884e236f282d3a775891
 
       - name: 'Dependency Review'
-        uses: actions/dependency-review-action@29022577bf5deaf5ce4e137a74d591b4c66c8b99
+        uses: actions/dependency-review-action@0ff3da6f81b812d4ec3cf37a04e2308c7a723730

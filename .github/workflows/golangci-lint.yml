@@ -1,0 +1,64 @@
+name: golangci-lint
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - master
+      - main
+  pull_request:
+permissions:
+  contents: read
+  # Optional: allow read access to pull request. Use with `only-new-issues` option.
+  # pull-requests: read
+jobs:
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Harden Runner'
+        uses: step-security/harden-runner@266a5d6a507c6927766a67b8380f323eacd977a2
+        with:
+          disable-sudo: true
+          egress-policy: audit
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            objects.githubusercontent.com:443
+            raw.githubusercontent.com:443
+
+      - uses: actions/checkout@3ba5ee6fac7e0e30e2ea884e236f282d3a775891
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@bb5ff97ab9c85a2085c8968c49b14f9f0530e2a8
+        with:
+          go-version-file: './go.mod'
+
+      - name: 'Generate'
+        run:  go generate vault4summon
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
+          version: latest
+
+          # Optional: working directory, useful for monorepos
+          # working-directory: somedir
+
+          # Optional: golangci-lint command line arguments.
+          # args: --issues-exit-code=0
+
+          # Optional: show only new issues if it's a pull request. The default value is `false`.
+          # only-new-issues: true
+
+          # Optional: if set to true then the all caching functionality will be complete disabled,
+          #           takes precedence over all other caching options.
+          # skip-cache: true
+
+          # Optional: if set to true then the action don't cache or restore ~/go/pkg.
+          # skip-pkg-cache: true
+
+          # Optional: if set to true then the action don't cache or restore ~/.cache/go-build.
+          # skip-build-cache: true

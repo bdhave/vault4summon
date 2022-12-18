@@ -15,22 +15,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Harden Runner'
-        uses: step-security/harden-runner@0a5820a2ec510d2521c1715d24860fc8cd06400a
+        uses: step-security/harden-runner@266a5d6a507c6927766a67b8380f323eacd977a2
         with:
           egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
           allowed-endpoints: >
             github.com:443
 
       - name: 'Checkout'
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+        uses: actions/checkout@3ba5ee6fac7e0e30e2ea884e236f282d3a775891
+        with:
+          fetch-depth: 0
 
       - name: 'Set up Go'
-        uses: actions/setup-go@6edd4406fa81c3da01a34fa6f6343087c207a568
+        uses: actions/setup-go@bb5ff97ab9c85a2085c8968c49b14f9f0530e2a8
         with:
-          go-version: 1.19.x
+          go-version-file: './go.mod'
+
+      - name: 'Generate'
+        run:  go generate vault4summon
 
       - name: 'Run GoReleaser'
-        uses: goreleaser/goreleaser-action@b508e2e3ef3b19d4e4146d4f8fb3ba9db644a757
+        uses: goreleaser/goreleaser-action@13f1e21a502d76668f53fc8631dfef02a96ecac6
         with:
           distribution: goreleaser
           version: latest

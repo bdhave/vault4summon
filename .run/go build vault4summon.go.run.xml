@@ -2,7 +2,8 @@
   <configuration default="false" name="go build vault4summon.go" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
     <module name="vault4summon" />
     <working_directory value="$PROJECT_DIR$" />
-    <parameters value="secret/hello#foo" />
+    <go_parameters value="-ldflags=&quot;-X 'main.Version=v1.0.0'&quot;" />
+    <parameters value="-v" />
     <kind value="FILE" />
     <directory value="$PROJECT_DIR$" />
     <filePath value="$PROJECT_DIR$/vault4summon.go" />

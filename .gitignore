@@ -15,3 +15,5 @@ initialization.json
 /vaultserver/volumes/DEV/audit/
 /vaultserver/volumes/DEV/files/
 /vaultserver/volumes/DEV/logs/
+/version.txt
+!/vault4summon
