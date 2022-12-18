@@ -28,6 +28,7 @@ jobs:
       uses: actions/checkout@3ba5ee6fac7e0e30e2ea884e236f282d3a775891
       with:
         fetch-depth: 0
+
     - name: 'Set up Go'
       uses: actions/setup-go@bb5ff97ab9c85a2085c8968c49b14f9f0530e2a8
       with:
