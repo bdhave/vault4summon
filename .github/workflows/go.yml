@@ -35,9 +35,6 @@ jobs:
     - name: 'Generate'
       run:  go generate vault4summon
 
-    - name: 'Genrerate debug'
-              cat version.txt
-
     - name: 'Build'
       run:  go build -o vault4summon
 
