@@ -1,0 +1,22 @@
+name: govulncheck scan
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Scan for Vulnerabilities in Code
+        uses: Templum/govulncheck-action@v0.0.7
+        with:
+          skip-upload: true
+        env:
+          DEBUG: "true"
+          
+      - name: Upload Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: raw-report
+          path: raw-report.json
