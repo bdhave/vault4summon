@@ -8,6 +8,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       - name: "create version.txt"
         run: echo "vuln-version">version.txt
 
@@ -15,11 +16,8 @@ jobs:
         uses: Templum/govulncheck-action@v0.0.7
         with:
           skip-upload: true
-        env:
-          DEBUG: "true"
-          
-      - name: Upload Report
+      - name: Upload Sarif Report
         uses: actions/upload-artifact@v3
         with:
-          name: raw-report
-          path: raw-report.json
+          name: sarif-report
+          path: govulncheck-report.sarif
