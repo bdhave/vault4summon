@@ -17,3 +17,5 @@ initialization.json
 /vaultserver/volumes/DEV/logs/
 /version.txt
 !/vault4summon
+/vault4summon
+/gosec.sarif
