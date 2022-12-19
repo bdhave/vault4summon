@@ -13,7 +13,7 @@ jobs:
         run: echo "vuln-version">version.txt
 
       - name: Scan for Vulnerabilities in Code
-        uses: Templum/govulncheck-action@v0.0.7
+        uses: Templum/govulncheck-action@v0.0.8
         with:
           skip-upload: true
       - name: Upload Sarif Report
