@@ -31,6 +31,9 @@ jobs:
         with:
           go-version-file: './go.mod'
 
+      - name: 'Go Version'
+        run:  go version
+
       - name: 'Generate'
         run:  go generate vault4summon
 
