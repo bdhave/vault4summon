@@ -38,7 +38,7 @@ jobs:
         run:  go generate vault4summon
 
       - name: 'Run GoReleaser'
-        uses: goreleaser/goreleaser-action@13f1e21a502d76668f53fc8631dfef02a96ecac6
+        uses: goreleaser/goreleaser-action@a7c543ca7a866f4d914fa7a767ded0c3868d0821
         with:
           distribution: goreleaser
           version: latest
