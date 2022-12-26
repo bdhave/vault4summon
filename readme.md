@@ -11,7 +11,7 @@ until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084)
 ## Quick start
 
 * Get vault4summon
-  * Download it or build it if you have a Go compiler or use [Nix](useNix4Go.md) to create your Go environment.
+  * Download it or build it if you have a Go compiler. I use always the latest increment and try to upgrade as soon as possible to the latest version. 
 * Install
   * Install [Summon][summon website] if you don't have it already installed
   * Copy `vault4summon` to `/usr/local/lib/summon/`
@@ -71,15 +71,10 @@ a pull request.
 When submitting code, please make efforts to follow existing conventions and style in order to keep the code as readable
 as possible. Please also make sure your code compiles and passes tests.
 
-~~Before your code can be accepted into the project, you must also sign the Individual Contributor License Agreement. I
-use [cla-assistant.io][cla]. You will be prompted to sign once a pull request is opened.~~
-
 [go language]: https://go.dev/
 [summon website]: https://cyberark.github.io/summon/
 [Hashicorp Vault]: https://www.vaultproject.io/
 [AWS-summon]: https://github.com/cyberark/summon-aws-secrets
 [Keepass]: https://github.com/mskarbek/summon-keepass
 [Gopass]: https://github.com/gopasspw/gopass-summon-provider
-
 [EUPL]: https://ec.europa.eu/isa2/solutions/european-union-public-licence-eupl_en/
-[cla]: https://cla-assistant.io
