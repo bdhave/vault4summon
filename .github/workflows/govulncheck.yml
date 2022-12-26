@@ -27,7 +27,7 @@ jobs:
               vuln.go.dev:443
 
       - name: 'Checkout Repository'
-        uses: actions/checkout@v3
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
         with:
           fetch-depth: 0
 
@@ -35,11 +35,11 @@ jobs:
         run: echo "vuln-version">version.txt
 
       - name: Scan for Vulnerabilities in Code
-        uses: Templum/govulncheck-action@v0.0.8
+        uses: Templum/govulncheck-action@f115ae331f94d0a83a9552234fc00f3d4516e6dc # v0.0.8
         with:
           skip-upload: true
       - name: Upload Sarif Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
         with:
           name: sarif-report
           path: govulncheck-report.sarif
