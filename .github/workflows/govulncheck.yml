@@ -1,5 +1,5 @@
 name: govulncheck scan
-on: [push, pull_request
+on: [push, pull_request]
 
 permissions:  # added using https://github.com/step-security/secure-workflows
   contents: read
