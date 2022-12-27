@@ -31,7 +31,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-go@991a6a2c3e9d4605a6fc1784d647ca2bc0e88be9
+      - uses: actions/setup-go@32705aee25c0929a67b5e22e1f41b452dadbb343
         with:
           go-version-file: './go.mod'
 
