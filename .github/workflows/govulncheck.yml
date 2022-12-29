@@ -31,16 +31,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "create version.txt"
+      - name: "create version.txt needed for compilation"
         run: echo "vuln-version">version.txt
 
       - name: Scan for Vulnerabilities in Code
         uses: Templum/govulncheck-action@f115ae331f94d0a83a9552234fc00f3d4516e6dc # v0.0.8
         with:
-          skip-upload: true
-
-# Upload the results to GitHub's code scanning dashboard.
-      - name: "Upload to code-scanning"
-        uses: github/codeql-action/upload-sarif@579411fb6c2fa885902ffeb0238873661aa2dc29
-        with:
-          sarif_file: govulncheck-report.sarif
+          skip-upload: false
