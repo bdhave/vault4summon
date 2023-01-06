@@ -47,7 +47,7 @@ jobs:
       run:  go test ./...
 
     - name: 'Upload binaries'
-      uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb
+      uses: actions/upload-artifact@65d862660abb392b8c4a3d1195a2108db131dd05
       with:
         name: vault4summon linux amd64
         path: vault4summon
