@@ -23,4 +23,4 @@ jobs:
         uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
 
       - name: 'Dependency Review'
-        uses: actions/dependency-review-action@a482eabd84caa0df204661f958b46f524e88cacc
+        uses: actions/dependency-review-action@96d0e9ac03c6a111a2b4382affc3ff7701be1abb
