@@ -20,7 +20,7 @@ jobs:
             storage.googleapis.com:443
 
       - name: 'Checkout Repository'
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
+        uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f
 
       - name: 'Dependency Review'
         uses: actions/dependency-review-action@a482eabd84caa0df204661f958b46f524e88cacc
