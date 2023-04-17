@@ -22,20 +22,23 @@ jobs:
             github.com:443
 
       - name: 'Checkout'
-        uses: actions/checkout@3ba5ee6fac7e0e30e2ea884e236f282d3a775891
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
         with:
           fetch-depth: 0
 
       - name: 'Set up Go'
-        uses: actions/setup-go@bb5ff97ab9c85a2085c8968c49b14f9f0530e2a8
+        uses: actions/setup-go@fa319ab135f5f244f88130e2874b6782750e9ef8
         with:
           go-version-file: './go.mod'
+
+      - name: 'Go Version'
+        run:  go version
 
       - name: 'Generate'
         run:  go generate vault4summon
 
       - name: 'Run GoReleaser'
-        uses: goreleaser/goreleaser-action@13f1e21a502d76668f53fc8631dfef02a96ecac6
+        uses: goreleaser/goreleaser-action@a7c543ca7a866f4d914fa7a767ded0c3868d0821
         with:
           distribution: goreleaser
           version: latest

@@ -1,0 +1,40 @@
+name: govulncheck scan
+on: [push, pull_request]
+
+permissions:  # added using https://github.com/step-security/secure-workflows
+  contents: read
+
+jobs:
+  build:
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      security-events: write  # for github/codeql-action/upload-sarif to upload SARIF results
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # v2.0.0
+        with:
+          disable-sudo: true
+          egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+          allowed-endpoints: >      
+              auth.docker.io:443
+              github.com:443
+              production.cloudflare.docker.com:443
+              proxy.golang.org:443
+              registry-1.docker.io:443
+              storage.googleapis.com:443
+              sum.golang.org:443
+              vuln.go.dev:443
+
+      - name: 'Checkout Repository'
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.2.0
+        with:
+          fetch-depth: 0
+
+      - name: "create version.txt needed for compilation"
+        run: echo "vuln-version">version.txt
+
+      - name: Scan for Vulnerabilities in Code
+        uses: Templum/govulncheck-action@f115ae331f94d0a83a9552234fc00f3d4516e6dc # v0.0.8
+        with:
+          skip-upload: false

@@ -27,11 +27,11 @@ jobs:
             objects.githubusercontent.com:443
             raw.githubusercontent.com:443
 
-      - uses: actions/checkout@3ba5ee6fac7e0e30e2ea884e236f282d3a775891
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-go@bb5ff97ab9c85a2085c8968c49b14f9f0530e2a8
+      - uses: actions/setup-go@fa319ab135f5f244f88130e2874b6782750e9ef8
         with:
           go-version-file: './go.mod'
 
@@ -39,7 +39,7 @@ jobs:
         run:  go generate vault4summon
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@0ad9a0988b3973e851ab0a07adf248ec2e100376 # v3.3.1
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
           version: latest
