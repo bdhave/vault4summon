@@ -35,6 +35,6 @@ jobs:
         run: echo "vuln-version">version.txt
 
       - name: Scan for Vulnerabilities in Code
-        uses: Templum/govulncheck-action@af8ff86b2f081d9467be504d924488c9480267c2 # v0.10.0
+        uses: Templum/govulncheck-action@435a35e28c7e56076f6daf838b81c1aa76ee0c95 # v0.10.1
         with:
           skip-upload: false
