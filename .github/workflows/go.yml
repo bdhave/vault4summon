@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: 'Harden Runner'
-      uses: step-security/harden-runner@266a5d6a507c6927766a67b8380f323eacd977a2
+      uses: step-security/harden-runner@910b3276b25495e4cfd8669cf5d7ea16508b0241
       with:
         disable-sudo: true
         egress-policy: block
@@ -25,12 +25,12 @@ jobs:
           storage.googleapis.com:443
 
     - name: 'Checkout Repository'
-      uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
+      uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
       with:
         fetch-depth: 0
 
     - name: 'Set up Go'
-      uses: actions/setup-go@fa319ab135f5f244f88130e2874b6782750e9ef8
+      uses: actions/setup-go@41c2024c46acfe1d0b8c9b7f20e28406983e553b
       with:
         go-version-file: './go.mod'
 
