@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-
 	"vaultserver/command"
 )
 
 const (
 	defaultVaultAddressTransit = "http://localhost:8200"
-	tokenFileName              = "config/token.json"
+	tokenFileName              = "config/token.json" //#nosec
 )
 
 func main() {
