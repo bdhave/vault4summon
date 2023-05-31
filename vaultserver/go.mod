@@ -23,5 +23,4 @@ require (
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
-	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 )
