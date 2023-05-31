@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: 'Harden Runner'
-        uses: step-security/harden-runner@910b3276b25495e4cfd8669cf5d7ea16508b0241
+        uses: step-security/harden-runner@beefd8c500e5f70ce4fc69e314d454dcf8822f4b
         with:
           disable-sudo: true
           egress-policy: audit
@@ -44,7 +44,7 @@ jobs:
             storage.googleapis.com:443
 
       - name: "Checkout code"
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+        uses: actions/checkout@f095bcc56b7c2baf48f3ac70d6d6782f4f553222 # v3.2.0
         with:
           persist-credentials: false
 
@@ -76,6 +76,6 @@ jobs:
 
       # Upload the results to GitHub's code scanning dashboard.
       - name: "Upload to code-scanning"
-        uses: github/codeql-action/upload-sarif@bb28e7e59e2ad6c1e5400e671795b2fa1b2fca6f
+        uses: github/codeql-action/upload-sarif@96f284028262d223858647b5680642a84608cc87
         with:
           sarif_file: scorecards.sarif

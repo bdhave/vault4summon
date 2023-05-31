@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@03bee3930647ebbf994244c21ddbc0d4933aab4f # v2.3.0
+        uses: step-security/harden-runner@128a63446a954579617e875aaab7d2978154e969 # v2.4.0
         with:
           disable-sudo: true
           egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
@@ -27,7 +27,7 @@ jobs:
               vuln.go.dev:443
 
       - name: 'Checkout Repository'
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
+        uses: actions/checkout@f095bcc56b7c2baf48f3ac70d6d6782f4f553222 # v3.2.0
         with:
           fetch-depth: 0
 
@@ -35,6 +35,6 @@ jobs:
         run: echo "vuln-version">version.txt
 
       - name: Scan for Vulnerabilities in Code
-        uses: Templum/govulncheck-action@af8ff86b2f081d9467be504d924488c9480267c2 # v0.10.0
+        uses: Templum/govulncheck-action@435a35e28c7e56076f6daf838b81c1aa76ee0c95 # v0.10.1
         with:
           skip-upload: false

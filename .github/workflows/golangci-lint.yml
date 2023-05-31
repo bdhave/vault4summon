@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Harden Runner'
-        uses: step-security/harden-runner@910b3276b25495e4cfd8669cf5d7ea16508b0241
+        uses: step-security/harden-runner@beefd8c500e5f70ce4fc69e314d454dcf8822f4b
         with:
           disable-sudo: true
           egress-policy: audit
@@ -27,11 +27,11 @@ jobs:
             objects.githubusercontent.com:443
             raw.githubusercontent.com:443
 
-      - uses: actions/checkout@47fbe2df0ad0e27efb67a70beac3555f192b062f
+      - uses: actions/checkout@f095bcc56b7c2baf48f3ac70d6d6782f4f553222
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-go@41c2024c46acfe1d0b8c9b7f20e28406983e553b
+      - uses: actions/setup-go@49bc3307c5d359429e8aee983859eb8dfad28c6b
         with:
           go-version-file: './go.mod'
 
