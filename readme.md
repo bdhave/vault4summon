@@ -2,14 +2,7 @@
 >This project is distributed under the terms of the European Union Public Licence (EUPL) Version 1.2 or newer.`
 You can find the latest version of the EUPL licence [here][EUPL].
 
-> The work on this software project is in no way associated with my employer nor with the role I'm having at my employer. Any requests for changes will be decided upon exclusively by myself based on my personal preferences. I maintain this project as much or as little as my spare time permits.
-
->**WARNING: the current code was only tested with a Hashicorp Vault Server in development mode.
-It must therefore be considered as a Proof of Concept, and it is not intended to be used in production
-until [issue 1](https://github.com/bdhave/vault4summon/issues/1#issue-798122084) is  closed**
-
 ## Quick start
-
 * Get vault4summon
   * Download it or build it if you have a Go compiler. I use always the latest increment and try to upgrade as soon as possible to the latest version. 
 * Install
