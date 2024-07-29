@@ -22,7 +22,7 @@ jobs:
             github.com:443
 
       - name: 'Checkout'
-        uses: actions/checkout@f095bcc56b7c2baf48f3ac70d6d6782f4f553222
+        uses: actions/checkout@9a9194f87191a7e9055e3e9b95b8cfb13023bb08
         with:
           fetch-depth: 0
 
